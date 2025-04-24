@@ -1,0 +1,35 @@
+.location-selector {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.location-selector select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+    background-color: white;
+
+}
+
+.location-selector select:hover {
+    border-color: var(--primary-color);
+}
+
+.location-selector select:focus {
+    outline: none;
+}
+
+.location-selector select:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.location-selector .error {
+    color: var(--color-error);
+    font-size: 14px;
+    margin-top: 4px;
+}
