@@ -1,0 +1,59 @@
+@import "./fonts.css";
+
+:root {
+    /* Color */
+    --bg-color: rgba(245, 246, 250, 1);
+
+    --primary-color: #4880FF;
+    --primary-color-dark: #ff4500;
+    --color-error: #f43f5e;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --black: #000000;
+    --white: #ffffff;
+    --secondary-color: #4880FF;
+    --header-border-color: #FF45004d;
+    --input-background-color: #F1F4F9;
+    --border-color: #d8d8d8;
+
+    /* Fonts */
+    --font-family: "Inter", Arial, sans-serif;
+    --font-size-xsmall: 12px;
+    --font-size-small: 14px;
+    --font-size-normal: 16px;
+    --font-size-regular: 18px;
+    --font-size-medium: 20px;
+    --font-size-large: 24px;
+    --font-size-xlarge: 32px;
+    --font-size-xxlarge: 36px;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+
+
+    /* Font color */
+    --font-color: #202224;
+
+    /* Line Height */
+    --line-height-16: 16px;
+    --line-height-20: 20px;
+    --line-height-24: 24px;
+    --line-height-26: 26px;
+
+    /* Border */
+    --border: 1px solid var(--border-color)
+
+    --border-radius: 4px;
+    --border-radius-large: 8px;
+
+    /* Shadows */
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    /* Z-Index */
+    --z-header: 100;
+    --z-modal: 150;
+}
+
+border {
+    border-bottom: 0;
+}
