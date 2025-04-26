@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "@/App";
 import Login from "@/pages/Login/Login";
+import Product from "@/pages/Product/Product";
 import Dashboard from "@/pages/Dashboard/Dashboard";
 import Category from "@/pages/Category/Category";
 import User from "@/pages/User/User";
@@ -26,6 +27,11 @@ const router = createBrowserRouter([
             {
                 index: true,
                 Component: Dashboard,
+            },
+
+            {
+                path: "product",
+                Component: Product,
             },
             {
                 path: "categories-management",
