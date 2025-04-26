@@ -1,0 +1,30 @@
+
+.action_buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.action_button {
+    width: 48px;
+    height: 32px;
+    border: 1px solid #d5d5d5;
+    background-color: #fafbfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.action_button__right {
+    border-radius: 0 8px 8px 0;
+}
+.action_button svg,
+.action_button img {
+    width: 16px;
+    height: 16px;
+}
+.action_button:hover {
+    background-color: #f5f6fa;
+}
+
+
