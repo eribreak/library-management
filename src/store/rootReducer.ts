@@ -1,8 +1,10 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import { userReducer } from "./slices/userSlice";
+import { categoriesReducer } from "./slices/categorySlice";
+import { authReducer } from "./slices/authSlice";
 
 const rootReducer = combineReducers({
-    user: userReducer,
+    categories: categoriesReducer,
+    auth: authReducer,
 });
 
 export default rootReducer;

@@ -6,6 +6,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { history } from "./routes/history";
 import SideBar from "./components/layout/Sidebar/Sidebar";
 import Header from "./components/layout/Header/Header";
+import { ToasterProvider } from "./components/ui/toaster";
 
 function App() {
     history.navigate = useNavigate();
@@ -17,16 +18,21 @@ function App() {
 
     return (
         <>
-            <div className="app">
-                <Header
-                    toggleSidebar={toggleSidebar}
-                    isSidebarCollapsed={isSidebarCollapsed}
-                />
-                <div className="app__container">
-                    <SideBar isCollapsed={isSidebarCollapsed} />
-                    <Outlet />
+            <ToasterProvider>
+                <div className="app" data-toaster-context>
+                    <Header
+                        toggleSidebar={toggleSidebar}
+                        isSidebarCollapsed={isSidebarCollapsed}
+                    />
+                    <div className="app__container">
+                        <SideBar isCollapsed={isSidebarCollapsed} />
+
+                        <div className="app__container__content">
+                            <Outlet />
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </ToasterProvider>
         </>
     );
 }

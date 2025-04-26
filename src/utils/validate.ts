@@ -118,5 +118,45 @@ export const formSchema = z
         }
     );
 
+export const dialogSchema = z.object({
+    email: z
+        .string()
+        .min(1, "Email là bắt buộc")
+        .email("Email không hợp lệ")
+        .max(100)
+        .trim()
+        .optional(),
+    password: z
+        .string()
+        .min(8, "Mật khẩu là bắt buộc")
+        .max(100)
+        .trim()
+        .optional(),
+    name: z
+        .string()
+        .min(1, "Tên là bắt buộc")
+        .max(100, "Tên tối đa 100 ký tự")
+        .trim()
+        .optional(),
+    description: z
+        .string()
+        .min(1, "Mô tả là bắt buộc")
+        .max(500, "Mô tả tối đa 500 ký tự")
+        .trim()
+        .optional(),
+});
+
+export const name = z.string().min(1, "Tên là bắt buộc").max(100).trim();
+export const description = z
+    .string()
+    .min(1, "Mô tả là bắt buộc")
+    .max(100, "Mô tả tối đa 500 ký tự")
+    .trim();
+
+
+
+export type DialogSchemaType = typeof dialogSchema;
+export type DialogDataType = z.infer<DialogSchemaType>;
+
 export type FormSchemaType = typeof formSchema;
 export type FormDataType = z.infer<FormSchemaType>;

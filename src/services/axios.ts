@@ -1,11 +1,12 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { history } from "../routes/history";
+import { Configuration } from "./api/configuration";
+import { AdminApi, UserApi, AuthApi } from "./api/api";
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const baseURL = import.meta.env.VITE_API_URL;
 
 const axiosInstance = axios.create({
     baseURL,
-    withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use((config) => {
@@ -17,32 +18,22 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 axiosInstance.interceptors.response.use(
-    (response) => response,
+    (response: AxiosResponse) => response,
     async (error) => {
-        const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            try {
-                const res = await axios.post(
-                    `${baseURL}/auth/refresh`,
-                    {},
-                    { withCredentials: true }
-                );
-                const newToken = res.data.accessToken;
-
-                localStorage.setItem("accessToken", newToken);
-
-                axiosInstance.defaults.headers.Authorization = `Bearer ${newToken}`;
-                originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-                return axiosInstance(originalRequest);
-            } catch (refreshError) {
-                localStorage.removeItem("accessToken");
-                history.navigate("/login");
-                return Promise.reject(refreshError);
-            }
+        if (error.response?.status === 401) {
+            localStorage.removeItem("accessToken");
+            history.navigate("/login");
         }
         return Promise.reject(error);
     }
 );
+
 export default axiosInstance;
+
+const configuration = new Configuration({
+    basePath: baseURL,
+});
+
+export const adminApi = new AdminApi(configuration, undefined, axiosInstance);
+export const userApi = new UserApi(configuration, undefined, axiosInstance);
+export const authApi = new AuthApi(configuration, undefined, axiosInstance);
