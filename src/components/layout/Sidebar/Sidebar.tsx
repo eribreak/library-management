@@ -1,6 +1,8 @@
 import { FC } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "./Sidebar.module.css";
+import { useDispatch } from "react-redux";
+import { logout } from "@/store/slices/authSlice";
 
 interface SideBarProps {
     activePage?: string;
@@ -11,6 +13,15 @@ const SideBar: FC<SideBarProps> = ({
     activePage = "dashboard",
     isCollapsed = false,
 }) => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleLogout = (e: React.MouseEvent) => {
+        e.preventDefault();
+        dispatch(logout());
+        navigate("/login");
+    };
+
     return (
         <div
             className={`${styled.sidebar} ${
@@ -152,7 +163,7 @@ const SideBar: FC<SideBarProps> = ({
                 </Link>
 
                 <Link
-                    to="/borrowed-books-management"
+                    to="/orders-management"
                     className={`${styled.sidebar__nav_item} ${
                         activePage === "invoice"
                             ? styled.sidebar__nav_item_active
@@ -169,7 +180,7 @@ const SideBar: FC<SideBarProps> = ({
                 </Link>
 
                 <Link
-                    to="/rates-management"
+                    to="/reviews-management"
                     className={`${styled.sidebar__nav_item} ${
                         activePage === "inbox"
                             ? styled.sidebar__nav_item_active
@@ -187,8 +198,9 @@ const SideBar: FC<SideBarProps> = ({
 
                 <div className={styled.sidebar__divider}></div>
 
-                <Link
-                    to="/logout"
+                <a
+                    href="#"
+                    onClick={handleLogout}
                     className={`${styled.sidebar__nav_item} ${
                         activePage === "logout"
                             ? styled.sidebar__nav_item_active
@@ -202,7 +214,7 @@ const SideBar: FC<SideBarProps> = ({
                     <span className={isCollapsed ? styled.text_hidden : ""}>
                         Đăng xuất
                     </span>
-                </Link>
+                </a>
             </div>
         </div>
     );

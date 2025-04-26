@@ -10,26 +10,28 @@ import {
 import React, { useMemo, useState } from "react";
 
 export type Column<T> = {
-    key: keyof T;
+    key: keyof T ;
     header?: React.ReactNode;
     sortable?: boolean;
+    headerTextAlign?: string;
     render?: (row: T) => React.ReactNode;
 };
 
 interface CustomTableProps<T> extends Omit<TableRootProps, "columns"> {
     data: T[];
     columns: Column<T>[];
+    tableRowHeaderProps?: TableRowProps;
     tableCellProps?: TableCellProps;
     tableColumnHeaderProps?: TableColumnHeaderProps;
     tableHeaderProps?: TableHeaderProps;
     tableRowProps?: TableRowProps;
     tableBodyProps?: TableBodyProps;
 }
-
-const CustomTable = <T extends Record<string, string | number | Date>>({
+const CustomTable = <T,>({
     data,
     columns,
     tableColumnHeaderProps,
+    tableRowHeaderProps,
     tableCellProps,
     tableHeaderProps,
     tableRowProps,
@@ -75,18 +77,18 @@ const CustomTable = <T extends Record<string, string | number | Date>>({
     return (
         <Table.Root {...tableProps}>
             <Table.Header {...tableHeaderProps}>
-                <Table.Row>
+                <Table.Row  {...tableRowHeaderProps}>
                     {columns.map((col) => {
                         const isSorted = sortBy === col.key;
                         return (
                             <Table.ColumnHeader
                                 key={String(col.key)}
                                 {...tableColumnHeaderProps}
-                                {...tableColumnHeaderProps}
                                 onClick={() =>
                                     col.sortable && handleSort(col.key)
                                 }
                                 cursor={col.sortable ? "pointer" : "default"}
+                                textAlign={col.headerTextAlign}
                             >
                                 <span>
                                     {col.header}
@@ -107,7 +109,7 @@ const CustomTable = <T extends Record<string, string | number | Date>>({
             </Table.Header>
             <Table.Body {...tableBodyProps}>
                 {sortedData.map((row, index) => (
-                    <Table.Row key={index} {...tableRowProps}>
+                    <Table.Row key={index} {...tableRowProps} >
                         {columns.map((col) => (
                             <Table.Cell
                                 {...tableCellProps}
