@@ -7,7 +7,7 @@ import editIcon from "@/assets/images/images/edit-icon.svg";
 import FormDialog from "./FormDialog";
 import { CustomInputField } from "../form/CustomInputField";
 import { z } from "zod";
-import { name, description } from "@/utils/validate";
+import { name, description } from "@/utils/validator/commonValidator";
 
 const categorySchema = z.object({
     name: name,
@@ -72,15 +72,15 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
             {isEdit ? (
                 <CustomButton
                     onClick={openDialog}
-                    className={clsx(styled.action_button, styled.action_button_left)}
+                    className={clsx(
+                        styled.action_button,
+                        styled.action_button_left
+                    )}
                 >
                     <img src={editIcon} alt="Edit" />
                 </CustomButton>
             ) : (
-                <CustomButton
-                    onClick={openDialog}
-                    bg={"var(--primary-color)"}
-                >
+                <CustomButton onClick={openDialog} bg={"var(--primary-color)"}>
                     Thêm mới
                 </CustomButton>
             )}
@@ -95,7 +95,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
                     onSubmit={handleFormSubmit}
                     formFields={formFields}
                     defaultValues={defaultValues}
-                    schema={categorySchema} 
+                    schema={categorySchema}
                 />
             )}
         </>

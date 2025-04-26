@@ -2,8 +2,17 @@
 import { CustomForm } from "@/components/common/form";
 import { CustomCheckbox } from "@/components/common/form/CustomCheckbox";
 import { CustomInputField } from "@/components/common/form/CustomInputField";
-import { FormSchemaType, formSchema, FormDataType } from "@/utils/validate";
+import {
+    LoginSchemaType,
+    loginSchema,
+    LoginDataType,
+} from "@/utils/validator/authForm";
 import { Button } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loginRequest, clearErrors } from "@/store/slices/authSlice";
+import { RootState } from "@/store/store";
 import styled from "./Login.module.css";
 
 interface DataType {
@@ -18,7 +27,7 @@ const formDataArray: DataType[] = [
     {
         name: "email",
         label: "Địa chỉ email",
-        placeholder: "example@gmail.com"
+        placeholder: "example@gmail.com",
     },
     {
         name: "password",
@@ -33,12 +42,36 @@ const formDataArray: DataType[] = [
 ];
 
 const Login = () => {
-    // const [email, setEmail] = useState("");
-    // const [password, setPassword] = useState("");
-    // const [rememberMe, setRememberMe] = useState(true);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [loginSuccess, setLoginSuccess] = useState(false);
 
-    const handleSubmit = (data: FormDataType) => {
-        console.log(data);
+    const { isAuthenticated, loading, error } = useSelector(
+        (state: RootState) => state.auth
+    );
+
+    useEffect(() => {
+        if (isAuthenticated && loginSuccess) {
+            navigate("/dashboard");
+        }
+    }, [isAuthenticated, loginSuccess, navigate]);
+
+    useEffect(() => {
+        if (error) {
+            dispatch(clearErrors());
+        }
+    }, [error, dispatch]);
+
+    const handleSubmit = (data: LoginDataType) => {
+        if (data.email && data.password) {
+            dispatch(
+                loginRequest({
+                    email: data.email,
+                    password: data.password,
+                })
+            );
+            setLoginSuccess(true);
+        }
     };
 
     return (
@@ -50,8 +83,8 @@ const Login = () => {
                         Vui lòng nhập địa chỉ email và mật khẩu để tiếp tục
                     </p>
                 </div>
-                <CustomForm<FormSchemaType>
-                    schema={formSchema}
+                <CustomForm<LoginSchemaType>
+                    schema={loginSchema}
                     onSubmit={handleSubmit}
                 >
                     <div className="flex-container">
@@ -69,13 +102,8 @@ const Login = () => {
                                 } else {
                                     return (
                                         <CustomInputField
-                                            bg={"var(--input-background-color)"}
-                                            borderRadius={"8px"}
-                                            marginTop={"15px"}
-                                            minHeight={"56px"}
-                                            color={"var(--black)"}
+                                            className={styled.input_field}
                                             required={item.required}
-                                            
                                             key={index}
                                             name={item.name}
                                             label={item.label}
@@ -89,13 +117,10 @@ const Login = () => {
                         <div>
                             <div className={styled.button_group}>
                                 <Button
-                                    bg={"var(--secondary-color)"}
-                                    padding={"0px 48px"}
-                                    minHeight={"56px"}
+                                    className={styled.submit_button}
                                     type="submit"
-                                    width={"100%"}
-                                    maxWidth={"418px"}
-                                    
+                                    loading={loading}
+                                    loadingText="Đang đăng nhập..."
                                 >
                                     Đăng nhập
                                 </Button>
@@ -104,7 +129,6 @@ const Login = () => {
                     </div>
                 </CustomForm>
             </div>
-            
         </div>
     );
 };

@@ -1,11 +1,11 @@
 import { all, fork } from "redux-saga/effects";
-import { watchLoginRequest } from "./authSaga";
+import { authSaga } from "./authSaga";
 import categorySaga from "./categorySaga";
 
 
 export default function* rootSaga() {
     yield all([
-        fork(watchLoginRequest),
+        fork(authSaga),
         fork(categorySaga),
     ]);
 }
