@@ -83,7 +83,7 @@ const Category: React.FC = () => {
         dispatch(fetchCategories(searchTerm));
     }, [dispatch, searchTerm]);
 
-    useEffect(() => {
+    const updateDisplayData = () => {
         if (categories.length > 0) {
             setTotalItems(categories.length);
 
@@ -97,6 +97,10 @@ const Category: React.FC = () => {
             setDisplayData([]);
             setTotalItems(0);
         }
+    };
+
+    useEffect(() => {
+        updateDisplayData();
     }, [currentPage, categories, itemsPerPage]);
 
     const handleInputChange = (term: string) => {
