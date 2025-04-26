@@ -27,7 +27,6 @@ interface CustomTableProps<T> extends Omit<TableRootProps, "columns"> {
     tableRowProps?: TableRowProps;
     tableBodyProps?: TableBodyProps;
 }
-// extends Record<string, string | number | Date>
 const CustomTable = <T,>({
     data,
     columns,
