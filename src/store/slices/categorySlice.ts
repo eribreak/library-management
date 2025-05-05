@@ -14,28 +14,58 @@ export interface CategoryFormData {
     description: string;
 }
 
+export interface PaginationData {
+    total: number;
+    current_page: number;
+    total_pages: number;
+    per_page: number;
+}
+
+export interface CategoryResponse {
+    data: Category[];
+    pagination: PaginationData;
+}
+
 interface CategoriesState {
     categories: Category[];
     loading: boolean;
     error: string | null;
+    pagination: PaginationData;
 }
 
 const initialState: CategoriesState = {
     categories: [],
     loading: false,
     error: null,
+    pagination: {
+        total: 0,
+        current_page: 1,
+        total_pages: 1,
+        per_page: 10,
+    },
 };
 
 const categoriesSlice = createSlice({
     name: "categories",
     initialState,
     reducers: {
-        fetchCategories: (state) => {
+        fetchCategories: (
+            state,
+            _: PayloadAction<{
+                page?: number;
+                perPage?: number;
+                searchTerm?: string;
+            }>
+        ) => {
             state.loading = true;
             state.error = null;
         },
-        fetchCategoriesSuccess: (state, action: PayloadAction<Category[]>) => {
-            state.categories = action.payload;
+        fetchCategoriesSuccess: (
+            state,
+            action: PayloadAction<CategoryResponse>
+        ) => {
+            state.categories = action.payload.data;
+            state.pagination = action.payload.pagination;
             state.loading = false;
             state.error = null;
         },

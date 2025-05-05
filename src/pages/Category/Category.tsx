@@ -22,10 +22,42 @@ import CustomButton from "@/components/common/button/CustomButton";
 import { Box } from "@chakra-ui/react";
 
 const Category: React.FC = () => {
+    const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+
     const columns: Column<CategoryType>[] = [
+        {
+            key: "select",
+            header: "",
+            width: "50px",
+            render: (category) => (
+                <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category.id)}
+                    onChange={(e) => {
+                        if (e.target.checked) {
+                            setSelectedCategories([
+                                ...selectedCategories,
+                                category.id,
+                            ]);
+                        } else {
+                            setSelectedCategories(
+                                selectedCategories.filter(
+                                    (id) => id !== category.id
+                                )
+                            );
+                        }
+                    }}
+                    className={styles.category_checkbox}
+                />
+            ),
+        },
         {
             key: "name",
             header: "Tên danh mục",
+            width: "15%",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
             render: (category) => (
                 <div className={styles.category_name}>
                     {category?.name || "N/A"}
@@ -35,6 +67,10 @@ const Category: React.FC = () => {
         {
             key: "description",
             header: "Mô tả",
+            width: "65%",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
             render: (category) => (
                 <div className={styles.category_description}>
                     {category?.description || "N/A"}
@@ -52,7 +88,6 @@ const Category: React.FC = () => {
                         category={category}
                         onSubmit={(data) => handleEditSubmit(data)}
                     />
-
                     <CustomButton
                         onClick={() => handleDeleteCategory(category)}
                         className={clsx(
@@ -68,7 +103,7 @@ const Category: React.FC = () => {
     ];
 
     const dispatch = useDispatch();
-    const { categories, loading } = useSelector(
+    const { categories, loading, pagination } = useSelector(
         (state: RootState) => state.categories
     );
 
@@ -76,28 +111,16 @@ const Category: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [displayData, setDisplayData] = useState<CategoryType[]>([]);
-    const [totalItems, setTotalItems] = useState(0);
 
     useEffect(() => {
-        dispatch(fetchCategories(searchTerm));
-    }, [dispatch, searchTerm]);
-
-    useEffect(() => {
-        if (categories.length > 0) {
-            setTotalItems(categories.length);
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(
-                startIndex + itemsPerPage,
-                categories.length
-            );
-            setDisplayData(categories.slice(startIndex, endIndex));
-        } else {
-            setDisplayData([]);
-            setTotalItems(0);
-        }
-    }, [currentPage, categories, itemsPerPage]);
+        dispatch(
+            fetchCategories({
+                page: currentPage,
+                perPage: itemsPerPage,
+                searchTerm,
+            })
+        );
+    }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
     const handleInputChange = (term: string) => {
         setInputValue(term);
@@ -117,18 +140,29 @@ const Category: React.FC = () => {
     };
 
     const handleDeleteCategory = (category: CategoryType) => {
-        if (confirm("Are you sure you want to delete this category?")) {
+        if (window.confirm("Bạn có muốn xóa danh mục này không?")) {
             dispatch(deleteCategory(category.id));
         }
     };
 
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex =
-        categories.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
-    const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems);
+    const totalPages = pagination.total_pages;
+    const startIndex = (pagination.current_page - 1) * pagination.per_page + 1;
+    const endIndex = Math.min(
+        startIndex + pagination.per_page - 1,
+        pagination.total
+    );
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+    };
+
+    const handleBulkDelete = () => {
+        if (window.confirm("Bạn có muốn xóa những danh mục đã chọn không?")) {
+            selectedCategories.forEach((id) => {
+                dispatch(deleteCategory(id));
+            });
+            setSelectedCategories([]);
+        }
     };
 
     return (
@@ -148,13 +182,21 @@ const Category: React.FC = () => {
                 />
             </div>
 
+            <CustomButton
+                onClick={handleBulkDelete}
+                disabled={selectedCategories.length === 0}
+                className={styles.bulk_delete_button}
+            >
+                Xóa nhiều
+            </CustomButton>
+
             {loading ? (
                 <div className={styles.loading}>Đang tải...</div>
             ) : (
                 <>
                     <Box borderRadius={"8px"} overflow={"hidden"}>
                         <CustomTable<CategoryType>
-                            data={displayData}
+                            data={categories}
                             columns={columns}
                         />
                     </Box>
@@ -167,7 +209,7 @@ const Category: React.FC = () => {
                             itemsInfo={{
                                 startIndex,
                                 endIndex,
-                                totalItems,
+                                totalItems: pagination.total,
                             }}
                         />
                     </div>

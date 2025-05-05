@@ -18,12 +18,14 @@ interface CategoryFormDialogProps {
     isEdit: boolean;
     category?: Category;
     onSubmit: (data: CategoryFormData) => void;
+    id?: string;
 }
 
 export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
     isEdit,
     category,
     onSubmit,
+    id,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -71,6 +73,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         <>
             {isEdit ? (
                 <CustomButton
+                    id={id}
                     onClick={openDialog}
                     className={clsx(
                         styled.action_button,
@@ -80,7 +83,11 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
                     <img src={editIcon} alt="Edit" />
                 </CustomButton>
             ) : (
-                <CustomButton onClick={openDialog} bg={"var(--primary-color)"}>
+                <CustomButton
+                    id={id}
+                    onClick={openDialog}
+                    bg={"var(--primary-color)"}
+                >
                     Thêm mới
                 </CustomButton>
             )}

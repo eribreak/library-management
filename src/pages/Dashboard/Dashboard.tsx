@@ -165,6 +165,7 @@ const Dashboard = () => {
                     >
                         <GridItem
                             bg="white"
+                            w={"100%"}
                             p={4}
                             borderRadius="md"
                             boxShadow="sm"

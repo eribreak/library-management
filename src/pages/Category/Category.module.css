@@ -208,3 +208,30 @@
 .action_button:hover {
     background-color: #f5f6fa;
 }
+
+.category_checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #007bff;
+}
+
+.bulk_delete_button {
+    margin-bottom: 16px;
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.bulk_delete_button:hover {
+    background-color: #c82333;
+}
+
+.bulk_delete_button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+}

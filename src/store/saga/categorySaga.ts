@@ -20,17 +20,36 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { SagaIterator } from "redux-saga";
 
 function* fetchCategoriesWorker(
-    action: PayloadAction<string | undefined>
+    action: PayloadAction<{
+        page?: number;
+        perPage?: number;
+        searchTerm?: string;
+    }>
 ): SagaIterator {
     try {
-        const searchTerm = action.payload;
+        const { perPage = 99, searchTerm = "" } = action.payload || {};
         const response = yield call(
             [adminApi, adminApi.getCategories],
             99,
-            searchTerm || ""
+            searchTerm
         );
 
-        yield put(fetchCategoriesSuccess(response.data.data));
+        yield put(
+            fetchCategoriesSuccess({
+                data: response.data.data,
+                pagination: {
+                    total:
+                        response.data.pagination?.total ||
+                        response.data.data.length,
+                    current_page:
+                        response.data.pagination?.current_page || page,
+                    total_pages:
+                        response.data.pagination?.total_pages ||
+                        Math.ceil(response.data.data.length / perPage),
+                    per_page: response.data.pagination?.per_page || perPage,
+                },
+            })
+        );
     } catch (error: any) {
         const errorMessage =
             error.response?.data?.message || "Failed to fetch categories";
