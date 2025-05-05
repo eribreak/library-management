@@ -21,6 +21,7 @@ export interface CustomSelectProps extends CustomSelectRootProps {
     label?: string;
     optionsList: SelectOption[];
     placeholder?: string;
+    required?: boolean;
 }
 
 export const CustomSelect = ({
@@ -28,6 +29,7 @@ export const CustomSelect = ({
     label,
     optionsList,
     placeholder,
+    required = false,
     ...selectProps
 }: CustomSelectProps) => {
     const {
@@ -35,14 +37,20 @@ export const CustomSelect = ({
         formState: { errors },
     } = useFormContext();
 
+
     const error = errors[name]?.message as string | undefined;
+
+    const validOptionsList = Array.isArray(optionsList) ? optionsList : [];
+
     const collection = createListCollection({
-        items: optionsList,
+        items: validOptionsList,
     });
 
     return (
         <Field.Root invalid={!!error}>
-            <Field.Label htmlFor={name}>{label}</Field.Label>
+            <Field.Label htmlFor={name}>
+                {label} {required && <span style={{ color: "red" }}>*</span>}
+            </Field.Label>
             <Controller
                 name={name}
                 control={control}
@@ -65,17 +73,32 @@ export const CustomSelect = ({
                             </Select.IndicatorGroup>
                         </Select.Control>
                         <Portal>
-                            <Select.Positioner>
+                            <Select.Positioner style={{ zIndex: 9999 }}>
                                 <Select.Content>
-                                    {collection.items.map((option) => (
-                                        <Select.Item
-                                            item={option}
-                                            key={option.value}
-                                        >
-                                            {option.label}
-                                            <Select.ItemIndicator />
-                                        </Select.Item>
-                                    ))}
+                                    {(() => {
+                                        if (validOptionsList.length === 0) {
+                                            return (
+                                                <Select.Item
+                                                    item={{
+                                                        value: "",
+                                                        label: "Không có tùy chọn",
+                                                    }}
+                                                >
+                                                    Không có tùy chọn
+                                                </Select.Item>
+                                            );
+                                        } else {
+                                            return validOptionsList.map((option) => (
+                                                <Select.Item
+                                                    item={option}
+                                                    key={option.value}
+                                                >
+                                                    {option.label}
+                                                    <Select.ItemIndicator />
+                                                </Select.Item>
+                                            ));
+                                        }
+                                    })()}
                                 </Select.Content>
                             </Select.Positioner>
                         </Portal>

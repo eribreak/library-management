@@ -37,7 +37,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
         }
     };
 
-    const handleClearSearch = () => {
+    const 
+    handleClearSearch = () => {
         setInputValue("");
         onChange("");
         if (onSearch) {

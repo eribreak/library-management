@@ -12,8 +12,9 @@
     margin: 0 auto;
     border-bottom: 1px solid #e8e8e8;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0 30px;
+    
 }
 
 .sidebar__menu {
@@ -21,7 +22,7 @@
     flex-direction: row;
     padding: 24px 0;
     justify-content: space-between;
-    width: 100%;
+
 }
 
 .header__left {
@@ -30,6 +31,8 @@
 }
 
 .header__toggle {
+    width: 25px;
+    height: 25px;
     margin-right: 25px;
     display: flex;
     cursor: pointer;

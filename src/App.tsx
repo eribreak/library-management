@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./assets/styles/variables.css";
 import "./assets/styles/global.css";
 import "./App.css";
@@ -11,6 +11,24 @@ import { ToasterProvider } from "./components/ui/toaster";
 function App() {
     history.navigate = useNavigate();
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+    const checkWindowWidth = () => {
+        const isSmallScreen = window.innerWidth < 1024;
+        setIsSidebarCollapsed(isSmallScreen);
+    };
+
+    const setupWindowResizeListener = () => {
+        checkWindowWidth();
+        window.addEventListener('resize', checkWindowWidth);
+        return () => {
+            window.removeEventListener('resize', checkWindowWidth);
+        };
+    };
+
+    useEffect(() => {
+        const cleanup = setupWindowResizeListener();
+        return cleanup;
+    }, []);
 
     const toggleSidebar = () => {
         setIsSidebarCollapsed((prev) => !prev);

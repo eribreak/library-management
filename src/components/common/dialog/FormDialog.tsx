@@ -75,7 +75,7 @@ export const FormDialog = <
         <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
             {!hideDefaultTrigger && (
                 <Dialog.Trigger>
-                    <button className="primary-button">{triggerText}</button>
+                    <p className="primary-button">{triggerText}</p>
                 </Dialog.Trigger>
             )}
 

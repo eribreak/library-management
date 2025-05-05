@@ -1,20 +1,22 @@
 import { FC } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import styled from "./Sidebar.module.css";
 import { useDispatch } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 
 interface SideBarProps {
-    activePage?: string;
     isCollapsed?: boolean;
 }
 
-const SideBar: FC<SideBarProps> = ({
-    activePage = "dashboard",
-    isCollapsed = false,
-}) => {
+const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
+    const currentPath = location.pathname;
+
+    const isActive = (path: string) => {
+        return currentPath.startsWith(path);
+    };
 
     const handleLogout = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -32,17 +34,13 @@ const SideBar: FC<SideBarProps> = ({
                 <Link
                     to="/dashboard"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "dashboard"
+                        isActive("/dashboard")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
                 >
                     <img
-                        src={`/src/assets/images/images/${
-                            activePage === "dashboard"
-                                ? "dashboard-icon.svg"
-                                : "svg/black-dashboard.svg"
-                        }`}
+                        src="/src/assets/images/images/svg/black-dashboard.svg"
                         alt="Dashboard"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
@@ -53,28 +51,24 @@ const SideBar: FC<SideBarProps> = ({
                 <Link
                     to="/employees-management"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "contact"
+                        isActive("/employees-management")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
                 >
                     <img
-                        src={`/src/assets/images/images/${
-                            activePage === "contact"
-                                ? "white-contact.svg"
-                                : "contact-icon.svg"
-                        }`}
+                        src="/src/assets/images/images/contact-icon.svg"
                         alt="Employees management"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
-                        Quản lý nhân viên
+                        Nhân viên
                     </span>
                 </Link>
 
                 <Link
                     to="/users-management"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "team"
+                        isActive("/users-management")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
@@ -84,14 +78,14 @@ const SideBar: FC<SideBarProps> = ({
                         alt="Users management"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
-                        Quản lý người dùng
+                        Người dùng
                     </span>
                 </Link>
 
                 <Link
                     to="/authors-management"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "team"
+                        isActive("/authors-management")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
@@ -101,7 +95,7 @@ const SideBar: FC<SideBarProps> = ({
                         alt="Authors management"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
-                        Quản lý tác giả
+                        Tác giả
                     </span>
                 </Link>
 
@@ -110,28 +104,24 @@ const SideBar: FC<SideBarProps> = ({
                 <Link
                     to="/books-management"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "product-stock"
+                        isActive("/books-management")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
                 >
                     <img
-                        src={`/src/assets/images/images/${
-                            activePage === "product-stock"
-                                ? "svg/white-product-stock.svg"
-                                : "product-stock-icon.svg"
-                        }`}
+                        src="/src/assets/images/images/product-stock-icon.svg"
                         alt="Books management"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
-                        Quản lý sách
+                        Sách
                     </span>
                 </Link>
 
                 <Link
                     to="/publishers-management"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "calendar"
+                        isActive("/publishers-management")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
@@ -141,14 +131,14 @@ const SideBar: FC<SideBarProps> = ({
                         alt="Publishers management"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
-                        Quản lý nhà xuất bản
+                        Nhà xuất bản
                     </span>
                 </Link>
 
                 <Link
                     to="/categories-management"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "table"
+                        isActive("/categories-management")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
@@ -158,14 +148,14 @@ const SideBar: FC<SideBarProps> = ({
                         alt="Categories management"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
-                        Quản lý thể loại
+                        Thể loại
                     </span>
                 </Link>
 
                 <Link
                     to="/orders-management"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "invoice"
+                        isActive("/orders-management")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
@@ -175,14 +165,14 @@ const SideBar: FC<SideBarProps> = ({
                         alt="Borrowed books management"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
-                        Quản lý đơn mượn
+                        Đơn mượn
                     </span>
                 </Link>
 
                 <Link
                     to="/reviews-management"
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "inbox"
+                        isActive("/reviews-management")
                             ? styled.sidebar__nav_item_active
                             : ""
                     } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
@@ -192,7 +182,7 @@ const SideBar: FC<SideBarProps> = ({
                         alt="Rates management"
                     />
                     <span className={isCollapsed ? styled.text_hidden : ""}>
-                        Quản lý đánh giá
+                        Đánh giá
                     </span>
                 </Link>
 
@@ -202,10 +192,8 @@ const SideBar: FC<SideBarProps> = ({
                     href="#"
                     onClick={handleLogout}
                     className={`${styled.sidebar__nav_item} ${
-                        activePage === "logout"
-                            ? styled.sidebar__nav_item_active
-                            : ""
-                    } ${isCollapsed ? styled.sidebar__nav_item_collapsed : ""}`}
+                        isCollapsed ? styled.sidebar__nav_item_collapsed : ""
+                    }`}
                 >
                     <img
                         src="/src/assets/images/images/logout-icon.svg"

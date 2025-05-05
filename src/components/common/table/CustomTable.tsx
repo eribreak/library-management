@@ -10,10 +10,15 @@ import {
 import React, { useMemo, useState } from "react";
 
 export type Column<T> = {
-    key: keyof T ;
+    key: keyof T;
     header?: React.ReactNode;
     sortable?: boolean;
     headerTextAlign?: string;
+    cellAlign?: string;
+    width?: string;
+    overflow?: "hidden" | "visible" | "scroll" | "auto";
+    textOverflow?: "ellipsis" | "clip";
+    whiteSpace?: "normal" | "nowrap" | "pre" | "pre-wrap" | "pre-line";
     render?: (row: T) => React.ReactNode;
 };
 
@@ -27,7 +32,7 @@ interface CustomTableProps<T> extends Omit<TableRootProps, "columns"> {
     tableRowProps?: TableRowProps;
     tableBodyProps?: TableBodyProps;
 }
-// extends Record<string, string | number | Date>
+
 const CustomTable = <T,>({
     data,
     columns,
@@ -76,9 +81,9 @@ const CustomTable = <T,>({
     }, [data, sortBy, sortDirection]);
 
     return (
-        <Table.Root {...tableProps}>
+        <Table.Root {...tableProps} style={{ tableLayout: "fixed", width: "100%" }}>
             <Table.Header {...tableHeaderProps}>
-                <Table.Row  {...tableRowHeaderProps}>
+                <Table.Row {...tableRowHeaderProps}>
                     {columns.map((col) => {
                         const isSorted = sortBy === col.key;
                         return (
@@ -90,6 +95,11 @@ const CustomTable = <T,>({
                                 }
                                 cursor={col.sortable ? "pointer" : "default"}
                                 textAlign={col.headerTextAlign}
+                                w={col.width}
+                                bg="white"
+                                overflow={col.overflow}
+                                textOverflow={col.textOverflow}
+                                whiteSpace={col.whiteSpace}
                             >
                                 <span>
                                     {col.header}
@@ -110,11 +120,18 @@ const CustomTable = <T,>({
             </Table.Header>
             <Table.Body {...tableBodyProps}>
                 {sortedData.map((row, index) => (
-                    <Table.Row key={index} {...tableRowProps} >
+                    <Table.Row key={index} {...tableRowProps}>
                         {columns.map((col) => (
                             <Table.Cell
                                 {...tableCellProps}
                                 key={String(col.key)}
+                                w={col.width}
+                                textAlign={col.cellAlign}
+                                bg="white"
+                                overflow={col.overflow}
+                                textOverflow={col.textOverflow}
+                                whiteSpace={col.whiteSpace}
+                                title={col.textOverflow === "ellipsis" ? String(row[col.key]) : undefined}
                             >
                                 {(() => {
                                     if (col.render) {

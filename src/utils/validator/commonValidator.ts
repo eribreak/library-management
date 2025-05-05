@@ -21,3 +21,14 @@ export const password = z
     .trim()
     .optional();
 
+export const employee_code = z
+    .string()
+    .min(1, "Mã nhân viên không được để trống")
+    .max(20)
+    .trim();
+export const full_name = z
+    .string()
+    .min(1, "Tên nhân viên không được để trống")
+    .max(100)
+    .trim();
+
