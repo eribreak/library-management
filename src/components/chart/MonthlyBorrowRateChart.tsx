@@ -37,7 +37,7 @@ interface MonthlyBorrowRateChartProps {
 const MonthlyBorrowRateChart: React.FC<MonthlyBorrowRateChartProps> = ({
     stats = [],
     title = "Thống kê sách mượn theo tháng",
-    height = 500,
+    height = 300,
 }) => {
     if (!stats || stats.length === 0) {
         return (
@@ -131,9 +131,9 @@ const MonthlyBorrowRateChart: React.FC<MonthlyBorrowRateChartProps> = ({
     };
 
     return (
-        <Box >
-            <Box  height={`${height}px`} position="relative">
-                <Line  options={options} data={chartData} />
+        <Box>
+            <Box height={`${height}px`} position="relative">
+                <Line options={options} data={chartData} />
             </Box>
         </Box>
     );

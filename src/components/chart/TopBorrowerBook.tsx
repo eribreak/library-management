@@ -24,11 +24,13 @@ ChartJS.register(
 interface Props {
     stats: Record<string, number>;
     title?: string;
+    height?: number;
 }
 
 const TopBorrowersChart: FC<Props> = ({
     stats,
     title = "Top 10 độc giả mượn sách",
+    height = 300,
 }) => {
     const { labels, values } = useMemo(() => {
         const entries = Object.entries(stats)
@@ -55,6 +57,7 @@ const TopBorrowersChart: FC<Props> = ({
 
     const options: ChartOptions<"bar"> = {
         responsive: true,
+        maintainAspectRatio: false,
         indexAxis: "y",
         plugins: {
             title: { display: true, text: title },
@@ -70,7 +73,11 @@ const TopBorrowersChart: FC<Props> = ({
         },
     };
 
-    return <Bar data={data} options={options} />;
+    return (
+        <div style={{ height: height, width: "100%", position: "relative" }}>
+            <Bar data={data} options={options} />
+        </div>
+    );
 };
 
 export default TopBorrowersChart;

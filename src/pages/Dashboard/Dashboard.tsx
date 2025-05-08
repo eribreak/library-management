@@ -166,26 +166,40 @@ const Dashboard = () => {
                         <GridItem
                             bg="white"
                             w={"100%"}
-                            p={4}
+                            h="400px"
+                            p={6}
                             borderRadius="md"
                             boxShadow="sm"
+                            display="flex"
+                            flexDirection="column"
+                            overflow="hidden"
                         >
                             <MonthlyBorrowRateChart stats={monthlyStats} />
                         </GridItem>
                         <GridItem
                             bg="white"
-                            p={4}
+                            w={"100%"}
+                            h="400px"
+                            p={6}
                             borderRadius="md"
                             boxShadow="sm"
+                            display="flex"
+                            flexDirection="column"
+                            overflow="hidden"
                         >
                             <BooksByCategoryPie stats={categoryStats} />
                         </GridItem>
 
                         <GridItem
                             bg="white"
-                            p={4}
+                            w={"100%"}
+                            h="400px"
+                            p={6}
                             borderRadius="md"
                             boxShadow="sm"
+                            display="flex"
+                            flexDirection="column"
+                            overflow="hidden"
                         >
                             <TopBooksChart
                                 stats={topBooksStats}
@@ -194,9 +208,14 @@ const Dashboard = () => {
                         </GridItem>
                         <GridItem
                             bg="white"
-                            p={4}
+                            w={"100%"}
+                            h="400px"
+                            p={6}
                             borderRadius="md"
                             boxShadow="sm"
+                            display="flex"
+                            flexDirection="column"
+                            overflow="hidden"
                         >
                             <TopBorrowersChart
                                 stats={topBorrowersStats}
@@ -206,10 +225,15 @@ const Dashboard = () => {
 
                         <GridItem
                             bg="white"
-                            p={4}
+                            w={"100%"}
+                            h="400px"
+                            p={6}
                             borderRadius="md"
                             boxShadow="sm"
                             colSpan={{ base: 1, lg: 2 }}
+                            display="flex"
+                            flexDirection="column"
+                            overflow="hidden"
                         >
                             <TopFavouriteBooksChart
                                 stats={favoriteBooksStats}

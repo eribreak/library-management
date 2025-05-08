@@ -21,12 +21,14 @@ interface Props {
     stats: CategoryStat[];
     title?: string;
     doughnut?: boolean;
+    height?: number;
 }
 
 const BooksByCategoryPie: FC<Props> = ({
     stats,
     title = "Tỷ lệ sách theo danh mục",
     doughnut = false,
+    height = 300,
 }) => {
     const { labels, values, colors } = useMemo(() => {
         const lbls = stats.map((s) => s.name);
@@ -50,9 +52,13 @@ const BooksByCategoryPie: FC<Props> = ({
 
     const options: ChartOptions<"pie" | "doughnut"> = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             title: { display: true, text: title },
-            legend: { position: "right" },
+            legend: {
+                position: "right",
+                display: true,
+            },
             tooltip: {
                 callbacks: {
                     label: (ctx) =>
@@ -69,7 +75,11 @@ const BooksByCategoryPie: FC<Props> = ({
 
     const ChartComponent = doughnut ? "doughnut" : "pie";
 
-    return <Pie type={ChartComponent} data={data} options={options} />;
+    return (
+        <div style={{ height: height, width: "100%", position: "relative" }}>
+            <Pie type={ChartComponent} data={data} options={options} />
+        </div>
+    );
 };
 
 export default BooksByCategoryPie;

@@ -1,4 +1,3 @@
-
 import { FC, useMemo } from "react";
 import {
     Chart as ChartJS,
@@ -13,7 +12,6 @@ import {
     ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-
 
 ChartJS.register(
     CategoryScale,
@@ -31,19 +29,21 @@ interface BookStat {
 }
 
 interface Props {
-        stats: BookStat[];
-        top?: number;
-        title?: string;
+    stats: BookStat[];
+    top?: number;
+    title?: string;
+    height?: number;
 }
 
 const TopFavouriteBooksChart: FC<Props> = ({
     stats,
     top = 30,
     title = "Top sách được yêu thích",
+    height = 350,
 }) => {
-        const { labels, values } = useMemo(() => {
-        const entries = [...stats] 
-            .sort((a, b) => b.count - a.count) 
+    const { labels, values } = useMemo(() => {
+        const entries = [...stats]
+            .sort((a, b) => b.count - a.count)
             .slice(0, top);
 
         return {
@@ -52,14 +52,14 @@ const TopFavouriteBooksChart: FC<Props> = ({
         };
     }, [stats, top]);
 
-        const data: ChartData<"line"> = {
+    const data: ChartData<"line"> = {
         labels,
         datasets: [
             {
                 label: "Số lượt yêu thích",
                 data: values,
                 fill: false,
-                tension: 0.3, 
+                tension: 0.3,
                 borderWidth: 2,
                 pointRadius: 4,
             },
@@ -68,6 +68,7 @@ const TopFavouriteBooksChart: FC<Props> = ({
 
     const options: ChartOptions<"line"> = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             title: { display: true, text: title },
             legend: { display: false },
@@ -79,12 +80,15 @@ const TopFavouriteBooksChart: FC<Props> = ({
         },
         scales: {
             y: { beginAtZero: true, ticks: { precision: 0 } },
-            x: { ticks: { autoSkip: true, maxRotation: 45, minRotation: 0 } }, 
+            x: { ticks: { autoSkip: true, maxRotation: 45, minRotation: 0 } },
         },
     };
 
-    return <Line data={data} options={options} />;
+    return (
+        <div style={{ height: height, width: "100%", position: "relative" }}>
+            <Line data={data} options={options} />
+        </div>
+    );
 };
-
 
 export default TopFavouriteBooksChart;
