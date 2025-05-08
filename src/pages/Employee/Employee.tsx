@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./Employee.module.css";
 import SearchInput from "../../components/common/search-input/SearchInput";
 import { CustomTable } from "@/components/common/table";
 import { Column } from "@/components/common/table/CustomTable";
 import SimplePagination from "../../components/common/pagination/SimplePagination";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster, toaster } from "@/components/ui/toaster";
 import deleteIcon from "@/assets/images/images/delete-icon.svg";
 import clsx from "clsx";
 import {
@@ -16,43 +16,34 @@ import {
     Employee as EmployeeType,
     EmployeeFormData,
 } from "@/store/slices/employeeSlice";
-import { RootState } from "@/store/store";
+import { RootState, AppDispatch } from "@/store/store";
 import EmployeeFormDialog from "@/components/common/dialog/EmployeeFormDialog";
 import CustomButton from "@/components/common/button/CustomButton";
 import { Box } from "@chakra-ui/react";
+import { adminApi } from "@/services/axios";
 
 const Employee: React.FC = () => {
-    const dispatch = useDispatch();
-    const { employees, loading } = useSelector(
+    const dispatch = useDispatch<AppDispatch>();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { employees, loading, pagination } = useSelector(
         (state: RootState) => state.employees
     );
 
     const [inputValue, setInputValue] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [displayData, setDisplayData] = useState<EmployeeType[]>([]);
-    const [totalItems, setTotalItems] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(8);
+    const [importing, setImporting] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchEmployees(searchTerm));
-    }, [dispatch, searchTerm]);
-
-    useEffect(() => {
-        if (employees.length > 0) {
-            setTotalItems(employees.length);
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(
-                startIndex + itemsPerPage,
-                employees.length
-            );
-            setDisplayData(employees.slice(startIndex, endIndex));
-        } else {
-            setDisplayData([]);
-            setTotalItems(0);
-        }
-    }, [currentPage, employees, itemsPerPage]);
+        dispatch(
+            fetchEmployees({
+                page: currentPage,
+                perPage: itemsPerPage,
+                searchTerm,
+            })
+        );
+    }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
     const handleInputChange = (term: string) => {
         setInputValue(term);
@@ -81,13 +72,54 @@ const Employee: React.FC = () => {
         setCurrentPage(1);
     };
 
+    const handleImportClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            setImporting(true);
+            adminApi.importEmployees(file);
+
+            toaster.toast({
+                title: "Import thành công",
+                description: "Dữ liệu nhân viên đã được nhập thành công.",
+                status: "success",
+            });
+
+            dispatch(
+                fetchEmployees({
+                    page: currentPage,
+                    perPage: itemsPerPage,
+                    searchTerm,
+                })
+            );
+        } catch (error) {
+            toaster.toast({
+                title: "Import thất bại",
+                description: "Có lỗi xảy ra khi nhập dữ liệu nhân viên.",
+                status: "error",
+            });
+        } finally {
+            setImporting(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+        }
+    };
+
     const columns: Column<EmployeeType>[] = [
         {
             key: "id",
             header: "ID",
             render: (employee) => <div>{employee.id}</div>,
             width: "10%",
-        
         },
         {
             key: "employee_code",
@@ -139,18 +171,26 @@ const Employee: React.FC = () => {
         },
     ];
 
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex =
-        employees.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
-    const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems);
-
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
+    const totalItems = pagination?.total || 0;
+    const totalPages =
+        pagination?.total_pages || Math.ceil(totalItems / itemsPerPage);
+    const startIndex =
+        ((pagination?.current_page || 1) - 1) *
+            (pagination?.per_page || itemsPerPage) +
+        1;
+    const endIndex = Math.min(
+        startIndex + (pagination?.per_page || itemsPerPage) - 1,
+        totalItems
+    );
+
     return (
         <div>
             <Toaster />
+            <Box className={styles.employee_title}>Quản lý Nhân viên</Box>
             <Box className={styles.search_wrapper}>
                 <SearchInput
                     value={inputValue}
@@ -158,10 +198,26 @@ const Employee: React.FC = () => {
                     onSearch={handleSearch}
                     placeholder="Tìm kiếm nhân viên..."
                 />
-                <EmployeeFormDialog
-                    isEdit={false}
-                    onSubmit={(data) => handleCreateEmployee(data)}
-                />
+                <div className={styles.action_buttons}>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        accept=".csv"
+                        onChange={handleFileChange}
+                    />
+                    <CustomButton
+                        onClick={handleImportClick}
+                        className={styles.import_button}
+                        disabled={importing}
+                    >
+                        {importing ? "Đang import..." : "Import CSV"}
+                    </CustomButton>
+                    <EmployeeFormDialog
+                        isEdit={false}
+                        onSubmit={handleCreateEmployee}
+                    />
+                </div>
             </Box>
             {loading ? (
                 <div className={styles.loading}>Đang tải...</div>
@@ -169,7 +225,7 @@ const Employee: React.FC = () => {
                 <>
                     <Box borderRadius={"8px"} overflow={"hidden"}>
                         <CustomTable<EmployeeType>
-                            data={displayData}
+                            data={employees}
                             columns={columns}
                         />
                     </Box>

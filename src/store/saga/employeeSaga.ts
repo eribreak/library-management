@@ -15,22 +15,37 @@ import {
     deleteEmployeeSuccess,
     deleteEmployeeFailure,
     EmployeeFormData,
+    FetchEmployeesParams,
+    PaginationInfo,
 } from "../slices/employeeSlice";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { SagaIterator } from "redux-saga";
 
 function* fetchEmployeesWorker(
-    action: PayloadAction<string | undefined>
+    action: PayloadAction<FetchEmployeesParams>
 ): SagaIterator {
     try {
-        const searchTerm = action.payload;
+        const { page = 1, perPage = 10, searchTerm = "" } = action.payload;
         const response = yield call(
             [adminApi, adminApi.getEmployees],
-            99,
+            perPage,
+            page,
             searchTerm
         );
 
-        yield put(fetchEmployeesSuccess(response.data.data));
+        const pagination: PaginationInfo = response.data.pagination || {
+            total: response.data.data.length,
+            current_page: page,
+            total_pages: Math.ceil(response.data.data.length / perPage),
+            per_page: perPage,
+        };
+
+        yield put(
+            fetchEmployeesSuccess({
+                data: response.data.data,
+                pagination,
+            })
+        );
     } catch (error: any) {
         const errorMessage =
             error.response?.data?.message || "Failed to fetch employees";

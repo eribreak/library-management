@@ -15,28 +15,58 @@ export interface EmployeeFormData {
     email: string;
 }
 
+export interface PaginationInfo {
+    total: number;
+    current_page: number;
+    total_pages: number;
+    per_page: number;
+}
+
+export interface FetchEmployeesParams {
+    page?: number;
+    perPage?: number;
+    searchTerm?: string;
+}
+
 interface EmployeesState {
     employees: Employee[];
     loading: boolean;
     error: string | null;
+    pagination: PaginationInfo;
 }
 
 const initialState: EmployeesState = {
     employees: [],
     loading: false,
     error: null,
+    pagination: {
+        total: 0,
+        current_page: 1,
+        total_pages: 1,
+        per_page: 10,
+    },
 };
 
 const employeesSlice = createSlice({
     name: "employees",
     initialState,
     reducers: {
-        fetchEmployees: (state) => {
+        fetchEmployees: (
+            state,
+            _action: PayloadAction<FetchEmployeesParams>
+        ) => {
             state.loading = true;
             state.error = null;
         },
-        fetchEmployeesSuccess: (state, action: PayloadAction<Employee[]>) => {
-            state.employees = action.payload;
+        fetchEmployeesSuccess: (
+            state,
+            action: PayloadAction<{
+                data: Employee[];
+                pagination: PaginationInfo;
+            }>
+        ) => {
+            state.employees = action.payload.data;
+            state.pagination = action.payload.pagination;
             state.loading = false;
             state.error = null;
         },

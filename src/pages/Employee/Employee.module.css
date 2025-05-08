@@ -78,3 +78,20 @@
     color: #0066cc;
     white-space: nowrap;
 }
+
+.employee_title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.import_button {
+    background-color: green;
+    color: white;
+    margin-right: 16px;
+}
+
+.import_button:hover {
+    background-color: #006600;
+}
+
