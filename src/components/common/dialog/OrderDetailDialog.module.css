@@ -1,0 +1,156 @@
+.orderDetailDialog {
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dialogHeader {
+    border-bottom: 1px solid #eaeaea;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    background-color: var(--white);
+    z-index: 10;
+}
+
+.dialogTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.dialogContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px;
+}
+
+.infoSection {
+    margin-top: 20px;
+    margin-bottom: 24px;
+    background-color: var(--info-section);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.infoItem {
+    margin-bottom: 8px;
+}
+
+.infoLabel {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 4px;
+}
+
+.infoValue {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.statusBadge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status0 {
+    color: var(--white);
+}
+
+.status1 {
+    color: var(--white);
+}
+
+.status2 {
+    color: var(--white);
+}
+
+.status3 {
+    color: var(--white);
+}
+
+.tableContainer {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.actionButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #eaeaea;
+    background-color: var(--white);
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+}
+
+.closeButton {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.closeButton:hover {
+    background-color: #e8e8e8;
+}
+
+.saveButton {
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: white;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.saveButton:hover {
+    background-color: var(--primary-color-dark, #0958d9);
+}
+
+.loadingIndicator {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+}
+
+.spinnerAnimation {
+    animation: spin 1s linear infinite;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    height: 28px;
+    width: 28px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
