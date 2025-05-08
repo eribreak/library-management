@@ -27,10 +27,15 @@ function* fetchCategoriesWorker(
     }>
 ): SagaIterator {
     try {
-        const { perPage = 99, searchTerm = "" } = action.payload || {};
+        const {
+            page = 1,
+            perPage = 10,
+            searchTerm = "",
+        } = action.payload || {};
         const response = yield call(
             [adminApi, adminApi.getCategories],
-            99,
+            perPage,
+            page,
             searchTerm
         );
 

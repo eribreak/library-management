@@ -110,7 +110,7 @@ const Category: React.FC = () => {
     const [inputValue, setInputValue] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage] = useState(7);
 
     useEffect(() => {
         dispatch(
@@ -168,6 +168,7 @@ const Category: React.FC = () => {
     return (
         <div className={styles.content_container}>
             <Toaster />
+            <Box className={styles.category_title}>Quản lý Thể loại</Box>
 
             <div className={styles.search_wrapper}>
                 <SearchInput
