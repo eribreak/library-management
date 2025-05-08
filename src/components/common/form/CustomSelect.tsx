@@ -37,7 +37,6 @@ export const CustomSelect = ({
         formState: { errors },
     } = useFormContext();
 
-
     const error = errors[name]?.message as string | undefined;
 
     const validOptionsList = Array.isArray(optionsList) ? optionsList : [];
@@ -59,7 +58,10 @@ export const CustomSelect = ({
                         {...selectProps}
                         name={name}
                         value={value}
-                        onValueChange={({ value }) => onChange(value)}
+                        onValueChange={({ value }) => {
+                            onChange(value);
+                            console.log("Selected value:", value);
+                        }}
                         onInteractOutside={() => onBlur()}
                         collection={collection}
                     >
@@ -88,15 +90,17 @@ export const CustomSelect = ({
                                                 </Select.Item>
                                             );
                                         } else {
-                                            return validOptionsList.map((option) => (
-                                                <Select.Item
-                                                    item={option}
-                                                    key={option.value}
-                                                >
-                                                    {option.label}
-                                                    <Select.ItemIndicator />
-                                                </Select.Item>
-                                            ));
+                                            return validOptionsList.map(
+                                                (option) => (
+                                                    <Select.Item
+                                                        item={option}
+                                                        key={option.value}
+                                                    >
+                                                        {option.label}
+                                                        <Select.ItemIndicator />
+                                                    </Select.Item>
+                                                )
+                                            );
                                         }
                                     })()}
                                 </Select.Content>

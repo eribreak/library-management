@@ -22,7 +22,7 @@ interface FormDialogProps<TFormData = Record<string, unknown>> {
     isOpen?: boolean;
     onClose?: () => void;
     defaultValues?: Partial<TFormData>;
-    schema?: z.ZodType<TFormData>; 
+    schema?: z.ZodType<TFormData>;
 }
 
 export const FormDialog = <
@@ -85,7 +85,6 @@ export const FormDialog = <
                 <Dialog.Content>
                     <Dialog.Header>
                         <Dialog.Title>{title}</Dialog.Title>
-                        <Dialog.CloseTrigger />
                     </Dialog.Header>
 
                     <FormProvider {...methods}>

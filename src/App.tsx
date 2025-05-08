@@ -19,9 +19,9 @@ function App() {
 
     const setupWindowResizeListener = () => {
         checkWindowWidth();
-        window.addEventListener('resize', checkWindowWidth);
+        window.addEventListener("resize", checkWindowWidth);
         return () => {
-            window.removeEventListener('resize', checkWindowWidth);
+            window.removeEventListener("resize", checkWindowWidth);
         };
     };
 
@@ -45,7 +45,13 @@ function App() {
                     <div className="app__container">
                         <SideBar isCollapsed={isSidebarCollapsed} />
 
-                        <div className="app__container__content">
+                        <div
+                            className={`app__container__content ${
+                                isSidebarCollapsed
+                                    ? "app__container__content--sidebar-collapsed"
+                                    : ""
+                            }`}
+                        >
                             <Outlet />
                         </div>
                     </div>
