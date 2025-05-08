@@ -1,0 +1,100 @@
+.search_wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+}
+
+.add_button {
+    background-color: #1677ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.add_button:hover {
+    background-color: #0958d9;
+}
+
+.action_button {
+    width: 48px;
+    height: 32px;
+    border: 1px solid #d5d5d5;
+    background-color: #fafbfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.action_button__left {
+    border-radius: 8px 0 0 8px;
+}
+
+.action_button__right {
+    border-radius: 0 8px 8px 0;
+}
+
+.action_button svg,
+.action_button img {
+    width: 16px;
+    height: 16px;
+}
+
+.action_button:hover {
+    background-color: #f5f6fa;
+}
+
+.actions_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.publisher_name {
+    font-weight: 600;
+}
+
+.publisher_checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #007bff;
+}
+
+.bulk_delete_button {
+    margin-bottom: 16px;
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.bulk_delete_button:hover {
+    background-color: #c82333;
+}
+
+.bulk_delete_button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.publisher_title{
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
