@@ -35,7 +35,7 @@ export interface PaginationInfo {
 export interface FetchReviewsParams {
     page?: number;
     perPage?: number;
-    status?: string;
+    statusParam?: string;
     stars?: string;
     searchTerm?: string;
 }

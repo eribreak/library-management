@@ -196,7 +196,7 @@ const Employee: React.FC = () => {
                     value={inputValue}
                     onChange={handleInputChange}
                     onSearch={handleSearch}
-                    placeholder="Tìm kiếm nhân viên..."
+                    placeholder="Tìm kiếm theo tên hoặc mã nhân viên..."
                 />
                 <div className={styles.action_buttons}>
                     <input

@@ -7,6 +7,7 @@ import editIcon from "@/assets/images/images/edit-icon.svg";
 import FormDialog from "./FormDialog";
 import { CustomInputField } from "../form/CustomInputField";
 import { employeeSchema } from "@/utils/validator/employee";
+import { IoMdAddCircleOutline } from "react-icons/io";
 
 interface EmployeeFormDialogProps {
     isEdit: boolean;
@@ -84,7 +85,7 @@ const EmployeeFormDialog: React.FC<EmployeeFormDialogProps> = ({
                     borderRadius="md"
                     _hover={{ bg: "var(--primary-color-dark)" }}
                 >
-                    Thêm nhân viên
+                    <IoMdAddCircleOutline />
                 </CustomButton>
             )}
 

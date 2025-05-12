@@ -33,45 +33,54 @@ export const CustomMultiSelect = ({
             <Controller
                 name={name}
                 control={control}
-                render={({ field: { value = [], onChange, onBlur } }) => (
-                    <ReactSelect
-                        isMulti
-                        options={optionsList.map((option) => ({
+                render={({ field: { value = [], onChange, onBlur } }) => {
+                    const mapOptions = (options: SelectOption[]) => 
+                        options.map(option => ({
                             value: option.value,
                             label: option.label,
-                        }))}
-                        placeholder={placeholder}
-                        value={optionsList
-                            .filter(
-                                (option) =>
-                                    Array.isArray(value) &&
-                                    value.includes(option.value)
+                        }));
+                    
+                    const getSelectedOptions = (options: SelectOption[], selectedValues: any[]) => 
+                        options
+                            .filter(option => 
+                                Array.isArray(selectedValues) && 
+                                selectedValues.includes(option.value)
                             )
-                            .map((option) => ({
+                            .map(option => ({
                                 value: option.value,
                                 label: option.label,
-                            }))}
-                        onChange={(selectedOptions) => {
-                            const values = selectedOptions
-                                ? selectedOptions.map((option) => option.value)
-                                : [];
-                            onChange(values);
-                        }}
-                        onBlur={onBlur}
-                        closeMenuOnSelect={false}
-                        styles={{
-                            control: (base) => ({
-                                ...base,
-                                minHeight: "40px",
-                                borderRadius: "0.375rem",
-                            }),
-                            menu: (base) => ({
-                                ...base,
-                                zIndex: 9999,
-                            }),
-                        }}
-                    />
-                )}
+                            }));
+                    
+                    const handleChange = (selectedOptions: any) => {
+                        const values = selectedOptions
+                            ? selectedOptions.map((option: any) => option.value)
+                            : [];
+                        onChange(values);
+                    };
+                    
+                    return (
+                        <ReactSelect
+                            isMulti
+                            options={mapOptions(optionsList)}
+                            placeholder={placeholder}
+                            value={getSelectedOptions(optionsList, value)}
+                            onChange={handleChange}
+                            onBlur={onBlur}
+                            closeMenuOnSelect={false}
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    minHeight: "40px",
+                                    borderRadius: "0.375rem",
+                                }),
+                                menu: (base) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                }),
+                            }}
+                        />
+                    );
+                }}
             />
             {error && <Field.ErrorText>{error}</Field.ErrorText>}
         </Field.Root>

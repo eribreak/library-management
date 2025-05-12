@@ -8,6 +8,7 @@ import FormDialog from "./FormDialog";
 import { CustomInputField } from "../form/CustomInputField";
 import { z } from "zod";
 import { name, description } from "@/utils/validator/commonValidator";
+import { IoMdAddCircleOutline } from "react-icons/io";
 
 const publisherSchema = z.object({
     name: name,
@@ -89,7 +90,7 @@ const PublisherFormDialog: React.FC<PublisherFormDialogProps> = ({
                     borderRadius="md"
                     _hover={{ bg: "var(--primary-color-dark)" }}
                 >
-                    Thêm nhà xuất bản
+                    <IoMdAddCircleOutline />
                 </CustomButton>
             )}
 

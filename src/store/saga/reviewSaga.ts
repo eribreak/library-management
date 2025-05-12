@@ -23,20 +23,20 @@ function* fetchReviewsWorker(
         const {
             page = 1,
             perPage = 10,
-            status,
+            statusParam,
             searchTerm,
             stars,
         } = action.payload;
 
-        const statusParam = status === "" ? undefined : status;
+        const status = statusParam === "" ? undefined : statusParam;
 
         const response = yield call(
             [adminApi, adminApi.getReviews],
             perPage,
             page,
             searchTerm,
-            statusParam,
-            stars
+            stars,
+            status
         );
 
         const pagination: PaginationInfo = response.data.pagination || {

@@ -27,27 +27,25 @@
 }
 
 .status_pending {
-    padding: 6px 10px;
     border-radius: 4px;
-    font-size: 0.875rem;
+    font-size: 0.65rem;
     display: inline-block;
 }
 
 .status_completed {
-    padding: 6px 10px;
     background-color: #d4edda;
     color: #155724;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    display: inline-block;
+     border-radius: 4px;
+    font-size: 0.65rem;
+    display: inline-block;;
 }
 
 .status_overdue {
-    padding: 6px 10px;
+
     background-color: #f8d7da;
     color: #721c24;
-    border-radius: 4px;
-    font-size: 0.875rem;
+     border-radius: 4px;
+    font-size: 0.65rem;
     display: inline-block;
 }
 
@@ -64,4 +62,12 @@
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
+}
+
+.status_select {
+    border: 1px solid var(--black);
+    font-size: 0.875rem;
+    display: inline-block;
+    height: 30px;
+    border-radius: var(--border-radius-medium);
 }

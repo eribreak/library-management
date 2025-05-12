@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CustomTable } from "@/components/common/table";
 import { Column } from "@/components/common/table/CustomTable";
@@ -26,17 +26,6 @@ const Review = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(7);
 
-    useEffect(() => {
-        dispatch(
-            fetchReviews({
-                page: currentPage,
-                perPage: itemsPerPage,
-                status: filterStatus,
-                searchTerm: searchTerm,
-            })
-        );
-    }, [dispatch, filterStatus, searchTerm, currentPage, itemsPerPage]);
-
     const handleInputChange = (term: string) => {
         setSearchInput(term);
     };
@@ -53,16 +42,112 @@ const Review = () => {
         setCurrentPage(1);
     };
 
+    
+    const getNumericStatus = (status: string | number): number => {
+        if (status === "Pending" || status === 0 || status === "0") {
+            return 0;
+        } else if (status === "Approved" || status === 1 || status === "1") {
+            return 1;
+        } else {
+            return 2;
+        }
+    };
+
     const handleReviewStatusChange = (
         reviewId: number,
         e: React.ChangeEvent<HTMLSelectElement>
     ) => {
         const newStatus = e.target.value;
-        dispatch(updateReviewStatus({ reviewId, status: newStatus }));
+        const currentReview = reviews.find((review) => review.id === reviewId);
+
+        if (currentReview) {
+            const currentStatusValue = getNumericStatus(currentReview.status);
+            const newStatusValue = parseInt(newStatus);
+
+            
+            if (newStatusValue >= currentStatusValue || newStatusValue === 2) {
+                dispatch(updateReviewStatus({ reviewId, status: newStatus }));
+            }
+        } else {
+            dispatch(updateReviewStatus({ reviewId, status: newStatus }));
+        }
+
     };
 
     const renderStarRating = (stars: number) => {
         return <div className={styles.star_rating}>{stars}</div>;
+    };
+
+    const renderReviewComment = (review: ReviewType) => (
+        <div className={styles.review_comment}>{review.comment || "N/A"}</div>
+    );
+
+    const renderReviewID = (review: ReviewType) => (
+        <div className={styles.review_id}>{review.id || "N/A"}</div>
+    );
+
+    const renderReviewBook = (review: ReviewType) => (
+        <div className={styles.review_book}>
+            {review.book?.title || `Sách #${review.book_id}`}
+        </div>
+    );
+    const renderReviewUser = (review: ReviewType) => (
+        <div className={styles.review_user}>
+            {review.user?.full_name || review.user?.email || "Anonymous"}
+        </div>
+    );
+    const renderReviewStatus = (review: ReviewType) => {
+        const getStatusValue = (reviewStatus: string | number): string => {
+            if (reviewStatus === "Pending" || reviewStatus === 0) {
+                return "0";
+            } else if (reviewStatus === "Approved" || reviewStatus === 1) {
+                return "1";
+            } else {
+                return "2";
+            }
+        };
+
+        const status = getStatusValue(review.status);
+        const isRejected = status === "2";
+        const statusValue = parseInt(status);
+
+        
+        const getOptionsForStatus = (currentStatus: number): ReactNode[] => {
+            const options = [
+                <option key="0" value="0" disabled={currentStatus > 0}>
+                    Chờ duyệt
+                </option>,
+                <option key="1" value="1" disabled={currentStatus > 1}>
+                    Duyệt
+                </option>,
+                <option key="2" value="2">
+                    Từ chối
+                </option>,
+            ];
+
+            return options;
+        };
+
+        return (
+            <div className={styles.select_wrapper}>
+                <select
+                    
+                    value={status}
+                    onChange={(e) => handleReviewStatusChange(review.id, e)}
+                    disabled={isRejected}
+                    className={styles.action_select}
+                    title={
+                        isRejected
+                            ? "Đánh giá đã bị từ chối không thể thay đổi"
+                            : statusValue === 1
+                            ? "Đã duyệt, chỉ có thể từ chối"
+                            : "Chọn trạng thái đánh giá"
+                    }
+                >
+                    {getOptionsForStatus(statusValue)}
+                </select>
+            </div>
+        );
     };
 
     const columns: Column<ReviewType>[] = [
@@ -70,7 +155,7 @@ const Review = () => {
             key: "id" as keyof ReviewType,
             header: "ID",
             width: "5%",
-            render: (review) => <div>{review.id}</div>,
+            render: (review) => renderReviewID(review),
         },
         {
             key: "user" as keyof ReviewType,
@@ -79,13 +164,7 @@ const Review = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (review) => (
-                <div className={styles.user_name}>
-                    {review.user?.full_name ||
-                        review.user?.email ||
-                        "Anonymous"}
-                </div>
-            ),
+            render: (review) => renderReviewUser(review),
         },
         {
             key: "book" as keyof ReviewType,
@@ -94,11 +173,7 @@ const Review = () => {
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             width: "15%",
-            render: (review) => (
-                <div className={styles.book_title}>
-                    {review.book?.title || `Sách #${review.book_id}`}
-                </div>
-            ),
+            render: (review) => renderReviewBook(review),
         },
         {
             key: "star" as keyof ReviewType,
@@ -116,57 +191,25 @@ const Review = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (review) => (
-                <div className={styles.review_comment_expanded}>
-                    {review.comment}
-                </div>
-            ),
+            render: (review) => renderReviewComment(review),
         },
         {
             key: "status" as keyof ReviewType,
             header: "Trạng thái",
-            render: (review) => {
-                const isRejected =
-                    review.status === "Rejected" || review.status === 2;
-                const getStatusValue = (reviewStatus: any): string => {
-                    if (reviewStatus === "Pending" || reviewStatus === 0) {
-                        return "0";
-                    } else if (
-                        reviewStatus === "Approved" ||
-                        reviewStatus === 1
-                    ) {
-                        return "1";
-                    } else {
-                        return "2";
-                    }
-                };
-
-                const status = getStatusValue(review.status);
-
-                return (
-                    <div className={styles.select_wrapper}>
-                        <select
-                            value={status}
-                            onChange={(e) =>
-                                handleReviewStatusChange(review.id, e)
-                            }
-                            disabled={isRejected}
-                            className={styles.action_select}
-                            title={
-                                isRejected
-                                    ? "Đánh giá đã bị từ chối không thể thay đổi"
-                                    : ""
-                            }
-                        >
-                            <option value="0">Chờ duyệt</option>
-                            <option value="1">Duyệt</option>
-                            <option value="2">Từ chối</option>
-                        </select>
-                    </div>
-                );
-            },
+            render: (review) => renderReviewStatus(review),
         },
     ];
+
+    useEffect(() => {
+        dispatch(
+            fetchReviews({
+                page: currentPage,
+                perPage: itemsPerPage,
+                statusParam: filterStatus,
+                searchTerm: searchTerm,
+            })
+        );
+    }, [dispatch, filterStatus, searchTerm, currentPage, itemsPerPage]);
 
     const totalItems = pagination?.total || 0;
     const totalPages =

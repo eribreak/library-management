@@ -15,6 +15,7 @@ import SimplePagination from "@/components/common/pagination/SimplePagination";
 import { format } from "date-fns";
 import { Toaster } from "@/components/ui/toaster";
 import { Badge, Box } from "@chakra-ui/react";
+import { FaLockOpen, FaLock } from "react-icons/fa6";
 
 const User = () => {
     const dispatch = useDispatch();
@@ -26,15 +27,6 @@ const User = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(7);
-    useEffect(() => {
-        dispatch(
-            fetchUsers({
-                page: currentPage,
-                perPage: itemsPerPage,
-                searchTerm,
-            })
-        );
-    }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
     const handleInputChange = (term: string) => {
         setInputValue(term);
@@ -46,7 +38,6 @@ const User = () => {
     };
 
     const handleToggleUserStatus = (user: UserType) => {
-        // Toggle status between active (1) and inactive (0)
         const newStatus = user.status === "1" || user.status === 1 ? "0" : "1";
         const confirmMessage =
             newStatus === "0"
@@ -83,8 +74,7 @@ const User = () => {
         if (statusValue === "1") {
             return (
                 <Badge
-                    px={"0px"}
-                    w={"100%"}
+                    
                     textAlign={"center"}
                     className={styles.status_active}
                 >
@@ -94,7 +84,6 @@ const User = () => {
         } else {
             return (
                 <Badge
-                    w={"100%"}
                     textAlign={"center"}
                     className={styles.status_inactive}
                 >
@@ -104,30 +93,82 @@ const User = () => {
         }
     };
 
+    
+    const renderId = (user: UserType) => user.id;
+
+    const renderEmployeeCode = (user: UserType) => (
+        <span title={user.employee_code || "N/A"}>
+            {user.employee_code || "N/A"}
+        </span>
+    );
+
+    const renderName = (user: UserType) => (
+        <span title={user.full_name || "N/A"}>{user.full_name || "N/A"}</span>
+    );
+
+    const renderGender = (user: UserType) => (
+        <span title={user.gender || "N/A"}>{user.gender || "N/A"}</span>
+    );
+
+    const renderEmail = (user: UserType) => (
+        <span className={styles.user_email} title={user.email}>
+            {user.email}
+        </span>
+    );
+
+    const renderPhoneNumber = (user: UserType) => (
+        <span title={user.phone_number || "N/A"}>
+            {user.phone_number || "N/A"}
+        </span>
+    );
+
+    const renderAddress = (user: UserType) => (
+        <span title={user.address || "N/A"}>{user.address || "N/A"}</span>
+    );
+
+    const renderBirthDate = (user: UserType) => (
+        <span title={formatDate(user.birth_date)}>
+            {formatDate(user.birth_date)}
+        </span>
+    );
+
+    const renderActions = (user: UserType) => {
+        const isActive = user.status === "1" || user.status === 1;
+        return (
+            <div className={styles.column_actions}>
+                <CustomButton
+                    title="Thay đổi trạng thái"
+                    onClick={() => handleToggleUserStatus(user)}
+                    className={`${styles.action_button} ${
+                        isActive
+                            ? styles.action_button__danger
+                            : styles.action_button__success
+                    }`}
+                >
+                    {isActive ? <FaLock /> : <FaLockOpen />}
+                </CustomButton>
+            </div>
+        );
+    };
+
     const columns: Column<UserType>[] = [
         {
             key: "id" as keyof UserType,
             header: "ID",
             width: "5%",
-
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (user) => user.id,
+            render: renderId,
         },
         {
             key: "employee_code" as keyof UserType,
-            header: "Mã nhân viên",
+            header: "MNV",
             width: "10%",
-
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (user) => (
-                <span title={user.employee_code || "N/A"}>
-                    {user.employee_code || "N/A"}
-                </span>
-            ),
+            render: renderEmployeeCode,
         },
         {
             key: "name" as keyof UserType,
@@ -136,11 +177,7 @@ const User = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (user) => (
-                <span title={user.full_name || "N/A"}>
-                    {user.full_name || "N/A"}
-                </span>
-            ),
+            render: renderName,
         },
         {
             key: "gender" as keyof UserType,
@@ -149,9 +186,7 @@ const User = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (user) => (
-                <span title={user.gender || "N/A"}>{user.gender || "N/A"}</span>
-            ),
+            render: renderGender,
         },
         {
             key: "email" as keyof UserType,
@@ -160,11 +195,7 @@ const User = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (user) => (
-                <span className={styles.user_email} title={user.email}>
-                    {user.email}
-                </span>
-            ),
+            render: renderEmail,
         },
         {
             key: "phone_number" as keyof UserType,
@@ -173,11 +204,7 @@ const User = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (user) => (
-                <span title={user.phone_number || "N/A"}>
-                    {user.phone_number || "N/A"}
-                </span>
-            ),
+            render: renderPhoneNumber,
         },
         {
             key: "address" as keyof UserType,
@@ -186,11 +213,7 @@ const User = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (user) => (
-                <span title={user.address || "N/A"}>
-                    {user.address || "N/A"}
-                </span>
-            ),
+            render: renderAddress,
         },
         {
             key: "birth_date" as keyof UserType,
@@ -199,11 +222,7 @@ const User = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (user) => (
-                <span title={formatDate(user.birth_date)}>
-                    {formatDate(user.birth_date)}
-                </span>
-            ),
+            render: renderBirthDate,
         },
         {
             key: "status" as keyof UserType,
@@ -219,27 +238,8 @@ const User = () => {
             header: "Thao tác",
             headerTextAlign: "center",
             width: "10%",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            render: (user) => {
-                const isActive = user.status === "1" || user.status === 1;
-                return (
-                    <div className={styles.column_actions}>
-                        <CustomButton
-                            w={"100%"}
-                            onClick={() => handleToggleUserStatus(user)}
-                            className={`${styles.action_button} ${
-                                isActive
-                                    ? styles.action_button__danger
-                                    : styles.action_button__success
-                            }`}
-                        >
-                            {isActive ? "Khóa" : "Mở khóa"}
-                        </CustomButton>
-                    </div>
-                );
-            },
+            cellAlign: "center",
+            render: renderActions,
         },
     ];
 
@@ -259,6 +259,16 @@ const User = () => {
         setCurrentPage(page);
     };
 
+    useEffect(() => {
+        dispatch(
+            fetchUsers({
+                page: currentPage,
+                perPage: itemsPerPage,
+                searchTerm,
+            })
+        );
+    }, [dispatch, currentPage, itemsPerPage, searchTerm]);
+
     return (
         <div>
             <Toaster />
@@ -269,7 +279,7 @@ const User = () => {
                     value={inputValue}
                     onChange={handleInputChange}
                     onSearch={handleSearch}
-                    placeholder="Tìm kiếm người dùng..."
+                    placeholder="Tìm kiếm theo tên, email, MNV..."
                 />
             </Box>
 

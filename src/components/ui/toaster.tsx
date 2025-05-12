@@ -13,7 +13,7 @@ interface Toast {
     title: string;
     description: string;
     status: ToastStatus;
-    createdAt: number; 
+    createdAt: number;
 }
 
 let globalToastCallback:
@@ -144,11 +144,11 @@ export const Toaster: React.FC = () => {
         <div
             style={{
                 position: "fixed",
-                bottom: "20px",
+                top: "20px",
                 right: "20px",
                 zIndex: 9999,
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: "column-reverse",
                 alignItems: "flex-end",
             }}
         >

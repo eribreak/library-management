@@ -20,6 +20,7 @@ import { RootState } from "@/store/store";
 import AuthorFormDialog from "@/components/common/dialog/AuthorFormDialog";
 import CustomButton from "@/components/common/button/CustomButton";
 import { Box } from "@chakra-ui/react";
+import { MdDeleteSweep } from "react-icons/md";
 
 const Author: React.FC = () => {
     const dispatch = useDispatch();
@@ -41,6 +42,7 @@ const Author: React.FC = () => {
                 searchTerm,
             })
         );
+        setSelectedAuthors([]);
     }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
     const handleInputChange = (term: string) => {
@@ -77,41 +79,89 @@ const Author: React.FC = () => {
         }
     };
 
+    const headerCheckbox = (
+        <input
+            type="checkbox"
+            checked={
+                authors.length > 0 && selectedAuthors.length === authors.length
+            }
+            onChange={(e) => {
+                if (e.target.checked) {
+                    const allIds = authors.map((author) => author.id);
+                    setSelectedAuthors(allIds);
+                } else {
+                    setSelectedAuthors([]);
+                }
+            }}
+            className={styles.author_checkbox}
+        />
+    );
+
+    const renderCheckbox = (author: AuthorType) => (
+        <input
+            type="checkbox"
+            checked={selectedAuthors.includes(author.id)}
+            onChange={(e) => {
+                if (e.target.checked) {
+                    setSelectedAuthors([...selectedAuthors, author.id]);
+                } else {
+                    setSelectedAuthors(
+                        selectedAuthors.filter((id) => id !== author.id)
+                    );
+                }
+            }}
+            className={styles.author_checkbox}
+        />
+    );
+    const renderAuthorName = (author: AuthorType) => (
+        <div className={styles.author_name}>{author.name}</div>
+    );
+    const renderAuthorDescription = (author: AuthorType) => (
+        <div className={styles.author_description}>{author.description}</div>
+    );
+    const renderActions = (author: AuthorType) => {
+        const authorId = `author-${author.id}`;
+        return (
+            <div className={styles.actions_wrapper}>
+                <AuthorFormDialog
+                    key={`edit-${authorId}`}
+                    isEdit={true}
+                    author={author}
+                    onSubmit={(data) => handleEditSubmit(data)}
+                />
+                <CustomButton
+                    key={`delete-${authorId}`}
+                    onClick={() => handleDeleteAuthor(author)}
+                    className={clsx(
+                        styles.action_button,
+                        styles.action_button__right
+                    )}
+                >
+                    <img src={deleteIcon} alt="Delete" />
+                </CustomButton>
+            </div>
+        );
+    };
+    const renderAuthorId = (author: AuthorType) => <div>{author.id}</div>;
+
     const columns: Column<AuthorType>[] = [
         {
             key: "select",
-            header: "",
+            header: headerCheckbox,
             width: "50px",
-            render: (author) => (
-                <input
-                    type="checkbox"
-                    checked={selectedAuthors.includes(author.id)}
-                    onChange={(e) => {
-                        if (e.target.checked) {
-                            setSelectedAuthors([...selectedAuthors, author.id]);
-                        } else {
-                            setSelectedAuthors(
-                                selectedAuthors.filter((id) => id !== author.id)
-                            );
-                        }
-                    }}
-                    className={styles.author_checkbox}
-                />
-            ),
+            render: (author) => renderCheckbox(author),
         },
         {
             key: "id",
             header: "ID",
             width: "10%",
-            render: (author) => <div>{author.id}</div>,
+            render: (author) => renderAuthorId(author),
         },
         {
             key: "name",
             header: "Tên tác giả",
             width: "20%",
-            render: (author) => (
-                <div className={styles.author_name}>{author.name}</div>
-            ),
+            render: (author) => renderAuthorName(author),
         },
         {
             key: "description",
@@ -120,39 +170,13 @@ const Author: React.FC = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            render: (author) => (
-                <div className={styles.author_description}>
-                    {author.description}
-                </div>
-            ),
+            render: (author) => renderAuthorDescription(author),
         },
         {
             key: "actions",
             header: "Thao tác",
             headerTextAlign: "center",
-            render: (author) => {
-                const authorId = `author-${author.id}`;
-                return (
-                    <div className={styles.actions_wrapper}>
-                        <AuthorFormDialog
-                            key={`edit-${authorId}`}
-                            isEdit={true}
-                            author={author}
-                            onSubmit={(data) => handleEditSubmit(data)}
-                        />
-                        <CustomButton
-                            key={`delete-${authorId}`}
-                            onClick={() => handleDeleteAuthor(author)}
-                            className={clsx(
-                                styles.action_button,
-                                styles.action_button__right
-                            )}
-                        >
-                            <img src={deleteIcon} alt="Delete" />
-                        </CustomButton>
-                    </div>
-                );
-            },
+            render: (author) => renderActions(author),
         },
     ];
 
@@ -181,7 +205,7 @@ const Author: React.FC = () => {
                     value={inputValue}
                     onChange={handleInputChange}
                     onSearch={handleSearch}
-                    placeholder="Tìm kiếm tác giả..."
+                    placeholder="Tìm kiếm tên tác giả..."
                 />
                 <AuthorFormDialog
                     isEdit={false}
@@ -189,13 +213,27 @@ const Author: React.FC = () => {
                 />
             </Box>
 
-            <CustomButton
-                onClick={handleBulkDelete}
-                disabled={selectedAuthors.length === 0}
-                className={styles.bulk_delete_button}
-            >
-                Xóa nhiều
-            </CustomButton>
+            <Box display="flex" gap={2}>
+                <CustomButton
+                title="Xóa nhiều"
+                    onClick={handleBulkDelete}
+                    disabled={selectedAuthors.length === 0}
+                    className={styles.bulk_delete_button}
+                >
+                    <MdDeleteSweep />
+                </CustomButton>
+
+                {selectedAuthors.length > 0 && (
+                    <CustomButton
+                    
+                        onClick={() => setSelectedAuthors([])}
+                        bg="gray.500"
+                        _hover={{ bg: "gray.600" }}
+                    >
+                        Bỏ chọn tất cả ({selectedAuthors.length})
+                    </CustomButton>
+                )}
+            </Box>
 
             {loading ? (
                 <div className={styles.loading}>Đang tải...</div>

@@ -64,6 +64,17 @@
 
 .publisher_name {
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.publisher_description {
+    font-size: var(--font-size-small);
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .publisher_checkbox {

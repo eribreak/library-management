@@ -5,7 +5,7 @@
     --bg-color: rgba(245, 246, 250, 1);
 
     --primary-color: #4880FF;
-    --primary-color-dark: #ff4500;
+    --primary-color-dark: #3b6dd4;
     --color-error: #f43f5e;
     --color-success: #10b981;
     --color-warning: #f59e0b;
@@ -44,7 +44,8 @@
     /* Border */
     --border: 1px solid var(--border-color)
 
-    --border-radius: 4px;
+    --border-radius-small: 2px;
+    --border-radius-medium: 4px;
     --border-radius-large: 8px;
 
     /* Shadows */

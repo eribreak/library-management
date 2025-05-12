@@ -45,6 +45,12 @@ const Header: FC<HeaderProps> = ({ toggleSidebar }) => {
                                     Admin
                                 </div>
                             </div>
+                            <div className={styled.header_dropdown}>
+                                <img
+                                    src="/src/assets/images/images/svg/arrow-down.svg"
+                                    alt="Dropdown"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

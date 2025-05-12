@@ -20,6 +20,12 @@ interface OrderDetailDialogProps {
     onClose: () => void;
 }
 
+const STATUS_TEXT: Record<string, string> = {
+            "0": "Đang mượn",
+            "1": "Hoàn thành",
+            "2": "Quá hạn",
+        };
+
 const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
     orderId,
     isOpen,
@@ -29,61 +35,29 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
     const { selectedOrder, loading, updateSuccess } = useSelector(
         (state: RootState) => state.orders
     );
-    const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
     const [updatedDetails, setUpdatedDetails] = useState<OrderDetail[]>([]);
     const [hasChanges, setHasChanges] = useState(false);
 
-    useEffect(() => {
-        if (selectedOrder && selectedOrder.details) {
-            setOrderDetails(selectedOrder.details);
-            setUpdatedDetails(selectedOrder.details);
-        }
-    }, [selectedOrder]);
-
-    useEffect(() => {
-        if (!isOpen) {
-            setOrderDetails([]);
-            setUpdatedDetails([]);
-            setHasChanges(false);
-        }
-    }, [isOpen]);
-
-    useEffect(() => {
-        if (updateSuccess) {
-            onClose();
-            dispatch(resetUpdateStatus());
-        }
-    }, [updateSuccess, onClose, dispatch]);
+    const checkDetailChanges = (detail: OrderDetail) => {
+        const originalDetail = selectedOrder?.details.find(
+            (d) => d.id === detail.id
+        );
+        return (
+            originalDetail &&
+            (originalDetail.status !== detail.status ||
+                originalDetail.return_date_real !== detail.return_date_real)
+        );
+    };
 
     const handleUpdateDetails = (details: OrderDetail[]) => {
         setUpdatedDetails(details);
-        const changedDetails = details.filter((detail) => {
-            const originalDetail = selectedOrder?.details.find(
-                (d) => d.id === detail.id
-            );
-            return (
-                originalDetail &&
-                (originalDetail.status !== detail.status ||
-                    originalDetail.return_date_real !== detail.return_date_real)
-            );
-        });
-
-        setHasChanges(changedDetails.length > 0);
+        const hasAnyChanges = details.some(checkDetailChanges);
+        setHasChanges(hasAnyChanges);
     };
 
     const handleSave = () => {
         const changedDetails: UpdateOrderDetailRequest[] = updatedDetails
-            .filter((detail) => {
-                const originalDetail = selectedOrder?.details.find(
-                    (d) => d.id === detail.id
-                );
-                return (
-                    originalDetail &&
-                    (originalDetail.status !== detail.status ||
-                        originalDetail.return_date_real !==
-                            detail.return_date_real)
-                );
-            })
+            .filter(checkDetailChanges)
             .map((detail) => ({
                 id: detail.id,
                 status: detail.status,
@@ -102,34 +76,23 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
         }
     };
 
-    const renderStatusBadge = (status: string) => {
-        let statusText = "";
-        let statusClass = "";
-
-        switch (status) {
-            case "0":
-                statusText = "Đang mượn";
-                statusClass = styles.status0;
-                break;
-            case "1":
-                statusText = "Hoàn thành";
-                statusClass = styles.status1;
-                break;
-            case "2":
-                statusText = "Quá hạn";
-                statusClass = styles.status2;
-                break;
-            default:
-                statusText = "Không xác định";
-                statusClass = "";
+     useEffect(() => {
+        if (isOpen && selectedOrder?.details) {
+            setUpdatedDetails(selectedOrder.details);
+            setHasChanges(false);
+        } else if (!isOpen) {
+            setUpdatedDetails([]);
+            setHasChanges(false);
         }
+    }, [isOpen, selectedOrder]);
 
-        return (
-            <span className={`${styles.statusBadge} ${statusClass}`}>
-                {statusText}
-            </span>
-        );
-    };
+    useEffect(() => {
+        if (updateSuccess) {
+            onClose();
+            dispatch(resetUpdateStatus());
+        }
+    }, [updateSuccess, dispatch]);
+
 
     return (
         <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -176,9 +139,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                                             Trạng thái:
                                         </p>
                                         <p className={styles.infoValue}>
-                                            {renderStatusBadge(
-                                                selectedOrder.status
-                                            )}
+                                            {selectedOrder.status}
                                         </p>
                                     </div>
                                 </div>
@@ -188,7 +149,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                         {selectedOrder && (
                             <div className={styles.tableContainer}>
                                 <OrderDetailTable
-                                    details={orderDetails}
+                                    details={updatedDetails}
                                     onUpdateDetails={handleUpdateDetails}
                                 />
                             </div>

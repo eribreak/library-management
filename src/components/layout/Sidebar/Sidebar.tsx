@@ -15,6 +15,12 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
     const currentPath = location.pathname;
 
     const isActive = (path: string) => {
+        if (
+            path === "/dashboard" &&
+            (currentPath === "/" || currentPath === "/dashboard")
+        ) {
+            return true;
+        }
         return currentPath.startsWith(path);
     };
 

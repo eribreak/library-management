@@ -19,7 +19,9 @@ import {
 import { RootState } from "@/store/store";
 import PublisherFormDialog from "@/components/common/dialog/PublisherFormDialog";
 import CustomButton from "@/components/common/button/CustomButton";
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
+import { MdDeleteSweep } from "react-icons/md";
+
 
 const Publisher: React.FC = () => {
     const dispatch = useDispatch();
@@ -41,7 +43,27 @@ const Publisher: React.FC = () => {
                 searchTerm,
             })
         );
+        setSelectedPublishers([]);
     }, [dispatch, searchTerm, currentPage, itemsPerPage]);
+
+    const headerCheckbox = (
+        <input
+            type="checkbox"
+            checked={
+                publishers.length > 0 &&
+                selectedPublishers.length === publishers.length
+            }
+            onChange={(e) => {
+                if (e.target.checked) {
+                    const allIds = publishers.map((pub) => pub.id);
+                    setSelectedPublishers(allIds);
+                } else {
+                    setSelectedPublishers([]);
+                }
+            }}
+            className={styles.publisher_checkbox}
+        />
+    );
 
     const handleInputChange = (term: string) => {
         setInputValue(term);
@@ -79,10 +101,14 @@ const Publisher: React.FC = () => {
         }
     };
 
+    const handleUnselectAll = () => {
+        setSelectedPublishers([]);
+    };
+
     const columns: Column<PublisherType>[] = [
         {
             key: "select",
-            header: "",
+            header: headerCheckbox,
             width: "50px",
             render: (publisher) => (
                 <input
@@ -188,7 +214,7 @@ const Publisher: React.FC = () => {
                     value={inputValue}
                     onChange={handleInputChange}
                     onSearch={handleSearch}
-                    placeholder="Tìm kiếm nhà xuất bản..."
+                    placeholder="Tìm kiếm tên nhà xuất bản..."
                 />
                 <PublisherFormDialog
                     isEdit={false}
@@ -196,13 +222,26 @@ const Publisher: React.FC = () => {
                 />
             </Box>
 
-            <CustomButton
-                onClick={handleBulkDelete}
-                disabled={selectedPublishers.length === 0}
-                className={styles.bulk_delete_button}
-            >
-                Xóa nhiều
-            </CustomButton>
+            <Flex gap={2}>
+                <CustomButton
+                title="Xóa nhiều"
+                    onClick={handleBulkDelete}
+                    disabled={selectedPublishers.length === 0}
+                    className={styles.bulk_delete_button}
+                >
+                    <MdDeleteSweep />
+                </CustomButton>
+
+                {selectedPublishers.length > 0 && (
+                    <CustomButton
+                        onClick={handleUnselectAll}
+                        bg="gray.500"
+                        _hover={{ bg: "gray.600" }}
+                    >
+                        Bỏ chọn tất cả ({selectedPublishers.length})
+                    </CustomButton>
+                )}
+            </Flex>
 
             {loading ? (
                 <div className={styles.loading}>Loading...</div>

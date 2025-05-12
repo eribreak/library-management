@@ -64,6 +64,9 @@
 
 .employee_name {
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .employee_code {
@@ -77,6 +80,8 @@
 .employee_email {
     color: #0066cc;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .employee_title {

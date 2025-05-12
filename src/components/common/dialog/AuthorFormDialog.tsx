@@ -8,6 +8,7 @@ import FormDialog from "./FormDialog";
 import { CustomInputField } from "../form/CustomInputField";
 import { z } from "zod";
 import { name, description } from "@/utils/validator/commonValidator";
+import { IoMdAddCircleOutline } from "react-icons/io";
 
 const authorSchema = z.object({
     name: name,
@@ -92,7 +93,7 @@ const AuthorFormDialog: React.FC<AuthorFormDialogProps> = ({
                     borderRadius="md"
                     _hover={{ bg: "var(--primary-color-dark)" }}
                 >
-                    Thêm tác giả
+                    <IoMdAddCircleOutline />
                 </CustomButton>
             );
         }

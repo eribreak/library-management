@@ -8,6 +8,7 @@ import FormDialog from "./FormDialog";
 import { CustomInputField } from "../form/CustomInputField";
 import { z } from "zod";
 import { name, description } from "@/utils/validator/commonValidator";
+import { IoMdAddCircleOutline } from "react-icons/io";
 
 const categorySchema = z.object({
     name: name,
@@ -88,7 +89,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
                     onClick={openDialog}
                     bg={"var(--primary-color)"}
                 >
-                    Thêm mới
+                    <IoMdAddCircleOutline />
                 </CustomButton>
             )}
 

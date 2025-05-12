@@ -36,6 +36,39 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
             onPageChange(currentPage + 1);
         }
     };
+    
+    const getPageNumbers = () => {
+        const pages = [];
+
+        
+        pages.push(1);
+
+        
+        const startPage = Math.max(2, currentPage - 2);
+        const endPage = Math.min(totalPages - 1, currentPage + 2);
+
+        
+        if (startPage > 2) {
+            pages.push("ellipsis1");
+        }
+
+        
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+
+        
+        if (endPage < totalPages - 1) {
+            pages.push("ellipsis2");
+        }
+
+        
+        if (totalPages > 1) {
+            pages.push(totalPages);
+        }
+
+        return pages;
+    };
 
     return (
         <div className={styles["pagination-container"]}>
@@ -43,7 +76,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
                 {totalItems > 0 ? (
                     <span>
                         Hiện từ {startIndex} đến {endIndex} của trên tổng số
-                        lượng: {totalItems}
+                        lượng: {totalItems} (Trang {currentPage}/{totalPages})
                     </span>
                 ) : (
                     <span>Không có</span>
@@ -52,6 +85,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
 
             {totalPages > 0 && (
                 <div className={styles["pagination-controls"]}>
+
                     <CustomButton
                         className={`${styles["pagination-button"]} ${
                             styles["pagination-button-left"]
@@ -61,6 +95,35 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
                     >
                         <img src={previousIcon} alt="Previous" />
                     </CustomButton>
+
+                    <div className={styles["page-numbers"]}>
+                        {getPageNumbers().map((page, index) => {
+                            if (page === "ellipsis1" || page === "ellipsis2") {
+                                return (
+                                    <span
+                                        key={`${page}-${index}`}
+                                        className={styles["ellipsis"]}
+                                    >
+                                        ...
+                                    </span>
+                                );
+                            }
+
+                            return (
+                                <CustomButton
+                                    key={`page-${page}`}
+                                    className={`${styles["page-number"]} ${
+                                        currentPage === page
+                                            ? styles["active"]
+                                            : ""
+                                    }`}
+                                    onClick={() => onPageChange(Number(page))}
+                                >
+                                    {page}
+                                </CustomButton>
+                            );
+                        })}
+                    </div>
 
                     <CustomButton
                         className={`${styles["pagination-button"]} ${
@@ -77,6 +140,8 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
                     >
                         <img src={nextIcon} alt="Next" />
                     </CustomButton>
+
+                   
                 </div>
             )}
         </div>

@@ -1,6 +1,5 @@
 .search_wrapper {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
     flex-wrap: wrap;
@@ -113,10 +112,12 @@
 .book_title {
     font-weight: 500;
     color: #0056b3;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* New select dropdown styles */
+
 .select_wrapper {
     position: relative;
     width: 100%;
@@ -159,4 +160,21 @@
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
+}
+
+.review_comment{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.review_book{
+        overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.review_user{
+        overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }

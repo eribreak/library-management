@@ -19,69 +19,66 @@ import {
 import { RootState } from "@/store/store";
 import { CategoryFormDialog } from "@/components/common/dialog/CategoryFormDialog";
 import CustomButton from "@/components/common/button/CustomButton";
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
+import { MdDeleteSweep } from "react-icons/md";
 
 const Category: React.FC = () => {
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
-    const columns: Column<CategoryType>[] = [
-        {
-            key: "select",
-            header: "",
-            width: "50px",
-            render: (category) => (
-                <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(category.id)}
-                    onChange={(e) => {
-                        if (e.target.checked) {
-                            setSelectedCategories([
-                                ...selectedCategories,
-                                category.id,
-                            ]);
-                        } else {
-                            setSelectedCategories(
-                                selectedCategories.filter(
-                                    (id) => id !== category.id
-                                )
-                            );
-                        }
-                    }}
-                    className={styles.category_checkbox}
-                />
-            ),
-        },
-        {
-            key: "name",
-            header: "Tên danh mục",
-            width: "15%",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            render: (category) => (
-                <div className={styles.category_name}>
-                    {category?.name || "N/A"}
-                </div>
-            ),
-        },
-        {
-            key: "description",
-            header: "Mô tả",
-            width: "65%",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            render: (category) => (
-                <div className={styles.category_description}>
-                    {category?.description || "N/A"}
-                </div>
-            ),
-        },
-        {
-            key: "actions",
-            header: "Thao tác",
-            headerTextAlign: "center",
-            render: (category) => (
+    const dispatch = useDispatch();
+    const { categories, loading, pagination } = useSelector(
+        (state: RootState) => state.categories
+    );
+
+    const headerCheckbox = (
+        <input
+            type="checkbox"
+            checked={
+                categories.length > 0 &&
+                selectedCategories.length === categories.length
+            }
+            onChange={(e) => {
+                if (e.target.checked) {
+                    const allIds = categories.map((cat) => cat.id);
+                    setSelectedCategories(allIds);
+                } else {
+                    setSelectedCategories([]);
+                }
+            }}
+            className={styles.category_checkbox}
+        />
+    );
+
+    const renderCheckbox = (category: CategoryType) => (
+        <input
+            type="checkbox"
+            checked={selectedCategories.includes(category.id)}
+            onChange={(e) => {
+                if (e.target.checked) {
+                    setSelectedCategories([
+                        ...selectedCategories,
+                        category.id,
+                    ]);
+                } else {
+                    setSelectedCategories(
+                        selectedCategories.filter((id) => id !== category.id)
+                    );
+                }
+            }}
+            className={styles.category_checkbox}
+        />
+    );
+    const renderCategoryName = (category: CategoryType) => (
+        <div className={styles.category_name}>
+            {category.name || "N/A"}
+        </div>
+    );
+    const renderCategoryDescription = (category: CategoryType) => (
+        <div className={styles.category_description}>
+            {category.description || "N/A"}
+        </div>
+    );
+    const renderCategoryActions = (category: CategoryType) => (
                 <div className={styles.category_table__action_buttons}>
                     <CategoryFormDialog
                         isEdit={true}
@@ -98,14 +95,40 @@ const Category: React.FC = () => {
                         <img src={deleteIcon} alt="Delete" />
                     </CustomButton>
                 </div>
-            ),
+            )
+
+    const columns: Column<CategoryType>[] = [
+        {
+            key: "select",
+            header: headerCheckbox,
+            width: "50px",
+            render: (category) => renderCheckbox(category),
+        },
+        {
+            key: "name",
+            header: "Tên danh mục",
+            width: "15%",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            render: (category) => renderCategoryName(category),
+        },
+        {
+            key: "description",
+            header: "Mô tả",
+            width: "65%",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            render: (category) => renderCategoryDescription(category),
+        },
+        {
+            key: "actions",
+            header: "Thao tác",
+            headerTextAlign: "center",
+            render: (category) => renderCategoryActions(category),
         },
     ];
-
-    const dispatch = useDispatch();
-    const { categories, loading, pagination } = useSelector(
-        (state: RootState) => state.categories
-    );
 
     const [inputValue, setInputValue] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
@@ -120,6 +143,7 @@ const Category: React.FC = () => {
                 searchTerm,
             })
         );
+        setSelectedCategories([]);
     }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
     const handleInputChange = (term: string) => {
@@ -165,6 +189,10 @@ const Category: React.FC = () => {
         }
     };
 
+    const handleUnselectAll = () => {
+        setSelectedCategories([]);
+    };
+
     return (
         <div className={styles.content_container}>
             <Toaster />
@@ -183,13 +211,26 @@ const Category: React.FC = () => {
                 />
             </div>
 
-            <CustomButton
-                onClick={handleBulkDelete}
-                disabled={selectedCategories.length === 0}
-                className={styles.bulk_delete_button}
-            >
-                Xóa nhiều
-            </CustomButton>
+            <Flex gap={2}>
+                <CustomButton
+                    title="Xóa nhiều"
+                    onClick={handleBulkDelete}
+                    disabled={selectedCategories.length === 0}
+                    className={styles.bulk_delete_button}
+                >
+                    <MdDeleteSweep />
+                </CustomButton>
+
+                {selectedCategories.length > 0 && (
+                    <CustomButton
+                        onClick={handleUnselectAll}
+                        bg="gray.500"
+                        _hover={{ bg: "gray.600" }}
+                    >
+                        Bỏ chọn tất cả ({selectedCategories.length})
+                    </CustomButton>
+                )}
+            </Flex>
 
             {loading ? (
                 <div className={styles.loading}>Đang tải...</div>

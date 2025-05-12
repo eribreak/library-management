@@ -14,8 +14,19 @@ import styles from "./Order.module.css";
 import SimplePagination from "@/components/common/pagination/SimplePagination";
 import OrderDetailDialog from "@/components/common/dialog/OrderDetailDialog";
 import { format } from "date-fns";
-import { Badge, Box } from "@chakra-ui/react";
+import {
+    Badge,
+    Box,
+    Popover,
+    Button,
+    Stack,
+    Input,
+    Flex,
+    Portal,
+    Text,
+} from "@chakra-ui/react";
 import { Toaster } from "@/components/ui/toaster";
+import { TbFilter, TbFilterCancel, TbFilterCheck } from "react-icons/tb";
 
 const Order = () => {
     const dispatch = useDispatch();
@@ -27,19 +38,18 @@ const Order = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(7);
-
     const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+    const [filterStatus, setFilterStatus] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [isFilterApplied, setIsFilterApplied] = useState(false);
 
-    useEffect(() => {
-        dispatch(
-            fetchOrders({
-                page: currentPage,
-                perPage: itemsPerPage,
-                searchTerm,
-            })
-        );
-    }, [dispatch, searchTerm, currentPage, itemsPerPage]);
+    const [activeFilters, setActiveFilters] = useState<{
+        status?: string;
+        startDate?: string;
+        endDate?: string;
+    }>({});
 
     const handleInputChange = (term: string) => {
         setInputValue(term);
@@ -71,23 +81,43 @@ const Order = () => {
 
     const renderStatus = (status: string) => {
         switch (status) {
-            case "0":
+            case "Đang mượn":
                 return (
-                    <Badge className={styles.status_pending}>Đang mượn</Badge>
+                    <Badge colorPalette={"gray"}>Đang mượn</Badge>
                 );
-            case "1":
+            case "Đã trả":
                 return (
-                    <Badge className={styles.status_completed}>
-                        Hoàn thành
+                    <Badge colorPalette={"green"}>
+                        Đã trả
                     </Badge>
                 );
-            case "2":
-                return <Badge className={styles.status_overdue}>Quá hạn</Badge>;
-            case "3":
-                return <Badge className={styles.status_issue}>Có vấn đề</Badge>;
+            case "Quá hạn":
+                return <Badge colorPalette={"red"}>Quá hạn</Badge>;
+            case "Mất":
+                return <Badge color={"darkgray"}>Mất</Badge>;
             default:
-                return <Badge colorPalette={"green"}>{status}</Badge>;
+                return <Badge colorPalette="green">{status}</Badge>;
         }
+    };
+
+    const handleApplyFilter = () => {
+        const newFilters = {
+            status: filterStatus || undefined,
+            startDate: startDate || undefined,
+            endDate: endDate || undefined,
+        };
+
+        setActiveFilters(newFilters);
+        setIsFilterApplied(true);
+        setCurrentPage(1);
+    };
+
+    const handleResetFilter = () => {
+        setFilterStatus("");
+        setStartDate("");
+        setEndDate("");
+        setActiveFilters({});
+        setIsFilterApplied(false);
     };
 
     const columns: Column<OrderType>[] = [
@@ -153,6 +183,19 @@ const Order = () => {
         },
     ];
 
+    useEffect(() => {
+        dispatch(
+            fetchOrders({
+                page: currentPage,
+                perPage: itemsPerPage,
+                searchTerm,
+                status: activeFilters.status,
+                startDate: activeFilters.startDate,
+                endDate: activeFilters.endDate,
+            })
+        );
+    }, [dispatch, searchTerm, currentPage, itemsPerPage, activeFilters]);
+
     const totalItems = pagination?.total || 0;
     const totalPages =
         pagination?.total_pages || Math.ceil(totalItems / itemsPerPage);
@@ -173,14 +216,139 @@ const Order = () => {
         <div>
             <Toaster />
             <Box className={styles.order_title}>Quản lý Đơn mượn</Box>
-            <Box className={styles.search_wrapper}>
-                <SearchInput
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onSearch={handleSearch}
-                    placeholder="Tìm kiếm đơn hàng..."
-                />
-            </Box>
+
+            <Flex mb={6} align="center">
+                <Box>
+                    <SearchInput
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onSearch={handleSearch}
+                        placeholder="Tìm kiếm đơn hàng..."
+                    />
+                </Box>
+                <Popover.Root positioning={{ placement: "left" }}>
+                    <Popover.Trigger>
+                        <CustomButton
+                            bg={
+                                isFilterApplied
+                                    ? "var(--primary-color)"
+                                    : "var(--color-success)"
+                            }
+                        >
+                            <TbFilter />
+                        </CustomButton>
+                    </Popover.Trigger>
+                    <Portal>
+                        <Popover.Positioner>
+                            <Popover.Content width={"fit-content"}>
+                                <Popover.Arrow />
+                                <Popover.CloseTrigger />
+                                <Popover.Body>
+                                    <Stack gap={4} direction={"row"} alignItems={"flex-end"}>
+                                        <div>
+                                            <Text
+                                                fontWeight={
+                                                    "var(--font-weight-bold)"
+                                                }
+                                                marginBottom={"5px"}
+                                            >
+                                                Trạng thái
+                                            </Text>
+                                            <select
+                                                className={styles.status_select}
+                                                value={filterStatus}
+                                                defaultValue={""}
+                                                onChange={(e) =>
+                                                    setFilterStatus(
+                                                        e.target.value
+                                                    )
+                                                }
+                                            >   
+                                                <option value="">
+                                                    Chọn trạng thái
+                                                </option>
+                                                <option value="0">
+                                                    Đang mượn
+                                                </option>
+                                                <option value="1">
+                                                    Hoàn thành
+                                                </option>
+                                                <option value="2">
+                                                    Quá hạn
+                                                </option>
+                                                <option value="3">Mất</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <Text
+                                                fontWeight={
+                                                    "var(--font-weight-bold)"
+                                                }
+                                                marginBottom={"5px"}
+                                            >
+                                                Từ ngày
+                                            </Text>
+                                            <Input
+                                                maxH={"30px"}
+                                                type="date"
+                                                value={startDate}
+                                                borderRadius={"var(--border-radius-medium)"}
+                                                onChange={(e) => {
+                                                    setStartDate(
+                                                        e.target.value
+                                                    );
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Text
+                                                fontWeight={
+                                                    "var(--font-weight-bold)"
+                                                }
+                                                marginBottom={"5px"}
+                                            >
+                                                Đến ngày
+                                            </Text>
+                                            <Input
+                                                maxH={"30px"}
+                                                type="date"
+                                                value={endDate}
+                                                borderRadius={"var(--border-radius-medium)"}
+                                                onChange={(e) =>
+                                                    setEndDate(e.target.value)
+                                                }
+                                            />
+                                        </div>
+
+                                        <Stack
+                                            direction="row"
+                                            gap={4}
+                                            justifyContent="flex-end"
+                                        >
+                                            <Button
+                                                variant="outline"
+                                                onClick={handleResetFilter}
+                                                title="Xóa bộ lọc"
+                                            >
+                                                <TbFilterCancel />
+                                            </Button>
+                                            <Button
+                                                title="Áp dụng bộ lọc"
+                                                colorScheme="blue"
+                                                onClick={handleApplyFilter}
+                                            >
+                                                <TbFilterCheck />
+                                            </Button>
+                                        </Stack>
+                                    </Stack>
+                                </Popover.Body>
+                            </Popover.Content>
+                        </Popover.Positioner>
+                    </Portal>
+                </Popover.Root>
+            </Flex>
 
             {loading ? (
                 <div className={styles.loading}>Đang tải...</div>

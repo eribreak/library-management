@@ -73,7 +73,7 @@
 }
 
 .author_description {
-    max-width: 400px;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

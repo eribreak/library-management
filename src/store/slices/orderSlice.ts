@@ -31,6 +31,8 @@ export interface FetchOrdersParams {
     perPage?: number;
     searchTerm?: string;
     status?: string;
+    startDate?: string;
+    endDate?: string;
 }
 
 export interface UpdateOrderDetailRequest {

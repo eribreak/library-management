@@ -145,12 +145,12 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchAllData();
-    }, [fetchAllData]);
+    }, []);
 
     return (
         <>
-            <Box padding="5" bg="gray.50">
-                <Heading as="h1" size="xl" mb={6}>
+            <Box bg="var(--bg-color)">
+                <Heading fontSize={"1.5rem"} fontWeight={"var(--font-weight-bold)"} mb={"1.5rem"}>
                     Dashboard
                 </Heading>
 
