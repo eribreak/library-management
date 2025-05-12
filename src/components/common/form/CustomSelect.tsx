@@ -60,7 +60,7 @@ export const CustomSelect = ({
                         value={value}
                         onValueChange={({ value }) => {
                             onChange(value);
-                            console.log("Selected value:", value);
+                        
                         }}
                         onInteractOutside={() => onBlur()}
                         collection={collection}
