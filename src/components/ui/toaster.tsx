@@ -206,7 +206,7 @@ export const toaster = {
 
             const toast = document.createElement("div");
             toast.style.position = "fixed";
-            toast.style.bottom = "20px";
+            toast.style.top = "20px";
             toast.style.right = "20px";
             toast.style.backgroundColor =
                 props.status === "error" ? "#f43f5e" : "#10b981";

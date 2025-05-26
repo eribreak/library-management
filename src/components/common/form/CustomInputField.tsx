@@ -26,7 +26,13 @@ export const CustomInputField = ({
                 {label}
                 {required && <span style={{ color: "red" }}>*</span>}
             </Field.Label>
-            <Input {...inputProps} id={name} {...register(name)} />
+            <Input
+                borderRadius={"var(--border-radius-medium)"}
+                focusRingColor={"rgb(228 228 231)"}
+                {...inputProps}
+                id={name}
+                {...register(name)}
+            />
             {error && <Field.ErrorText>{error}</Field.ErrorText>}
         </Field.Root>
     );

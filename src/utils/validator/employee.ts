@@ -5,7 +5,7 @@ export const employee_email = z
     .string()
     .min(1, "Email không được để trống")
     .email("Email không hợp lệ")
-    .max(100)
+    .max(100, "Email tối đa 100 ký tự")
     .trim()
     .refine(
         (email) => {

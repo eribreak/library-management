@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./assets/styles/variables.css";
 import "./assets/styles/global.css";
 import "./App.css";
+import "./assets/css/react-select-custom.css";
 import { Outlet, useNavigate } from "react-router-dom";
 import { history } from "./routes/history";
 import SideBar from "./components/layout/Sidebar/Sidebar";

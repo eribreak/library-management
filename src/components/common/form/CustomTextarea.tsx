@@ -6,6 +6,7 @@ export interface CustomTextareaProps extends TextareaProps {
     label?: string;
     placeholder?: string;
     rows?: number;
+    required?: boolean;
 }
 
 export const CustomTextarea = ({
@@ -13,6 +14,7 @@ export const CustomTextarea = ({
     label,
     placeholder,
     rows = 3,
+    required,
     ...textareaProps
 }: CustomTextareaProps) => {
     const {
@@ -24,12 +26,19 @@ export const CustomTextarea = ({
 
     return (
         <Field.Root invalid={!!error}>
-            {label && <Field.Label htmlFor={name}>{label}</Field.Label>}
+            {label && (
+                <Field.Label htmlFor={name}>
+                    {label}
+                    {required && <span style={{ color: "red" }}>*</span>}
+                </Field.Label>
+            )}
             <Controller
                 name={name}
                 control={control}
                 render={({ field }) => (
                     <Textarea
+                        borderRadius={"var(--border-radius-medium)"}
+                        focusRingColor={"rgb(228 228 231)"}
                         id={name}
                         placeholder={placeholder}
                         rows={rows}

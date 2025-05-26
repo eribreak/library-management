@@ -15,6 +15,11 @@
 
 * {
     box-sizing: border-box;
+    outline: none;
+}
+
+*:focus {
+    outline: none;
 }
 
 a {
@@ -48,15 +53,37 @@ input,
 select,
 textarea {
     border-radius: var(--border-radius);
+    padding-right: 15px;
 }
 
-/* @media (prefers-color-scheme: light) {
-    :root {
-        color: var(black);
-        background-color: var(--white);
-    }
+input:focus {
+    border-color: inherit;
+}
 
-    a:hover {
-        color: #747bff;
-    }
-} */
+textarea:focus {
+    border-color: inherit;
+}
+
+input[aria-invalid="true"] {
+    --focus-ring-color: var(--error-color);
+    border-color: var(--error-color);
+}
+
+input[aria-invalid="true"]:focus {
+    --focus-ring-color: var(--error-color);
+    border-color: var(--error-color);
+}
+textarea[aria-invalid="true"] {
+    --focus-ring-color: var(--error-color);
+    border-color: var(--error-color);
+}
+
+textarea[aria-invalid="true"]:focus {
+    --focus-ring-color: var(--error-color);
+    border-color: var(--error-color);
+}
+
+div[class="rsw-editor"] {
+    --focus-ring-color: var(--error-color);
+    border-color: var(--error-color);
+}

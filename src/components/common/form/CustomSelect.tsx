@@ -55,19 +55,19 @@ export const CustomSelect = ({
                 control={control}
                 render={({ field: { name, value, onChange, onBlur } }) => (
                     <Select.Root
+                        inputMode="text"
                         {...selectProps}
                         name={name}
                         value={value}
                         onValueChange={({ value }) => {
                             onChange(value);
-                        
                         }}
                         onInteractOutside={() => onBlur()}
                         collection={collection}
                     >
                         <Select.HiddenSelect />
                         <Select.Control>
-                            <Select.Trigger>
+                            <Select.Trigger p={"0px 10px"}>
                                 <Select.ValueText placeholder={placeholder} />
                             </Select.Trigger>
                             <Select.IndicatorGroup>

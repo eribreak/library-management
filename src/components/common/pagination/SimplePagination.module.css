@@ -82,9 +82,13 @@
 }
 
 .page-number.active {
-    background-color: #0066cc;
+    background-color: var(--primary-color);
     color: white;
-    border-color: #0066cc;
+    border-color: var(--primary-color);
+}
+
+.page-number.active:hover {
+    background-color: var(--primary-color-dark);
 }
 
 .ellipsis {

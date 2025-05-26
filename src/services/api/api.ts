@@ -4015,13 +4015,13 @@ export const AdminApiAxiosParamCreator = function (
             if (imageFile !== undefined) {
                 localVarFormParams.append("imageFile", imageFile as any);
             }
-            if (additionalImages) {
-                localVarFormParams.append(
-                    "additional_images[]",
-                    new Blob([JSON.stringify(additionalImages)], {
-                        type: "image/*",
-                    })
-                );
+            if (additionalImages && additionalImages.length > 0) {
+                for (let i = 0; i < additionalImages.length; i++) {
+                    localVarFormParams.append(
+                        "additional_images[]",
+                        additionalImages[i] as any
+                    );
+                }
             }
 
             if (author) {
@@ -5535,13 +5535,13 @@ export const AdminApiAxiosParamCreator = function (
             if (imageFile !== undefined) {
                 localVarFormParams.append("imageFile", imageFile as any);
             }
-            if (additionalImages) {
-                localVarFormParams.append(
-                    "additional_images[]",
-                    new Blob([JSON.stringify(additionalImages)], {
-                        type: "image/*",
-                    })
-                );
+            if (additionalImages && additionalImages.length > 0) {
+                for (let i = 0; i < additionalImages.length; i++) {
+                    localVarFormParams.append(
+                        "additional_images[]",
+                        additionalImages[i] as any
+                    );
+                }
             }
 
             if (author !== undefined) {

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styles from "./SearchInput.module.css";
 import searchIcon from "../../../assets/images/images/svg/search-icon.svg";
+import { HiMiniXMark } from "react-icons/hi2";
 
 interface SearchInputProps {
     placeholder: string;
     value: string;
     onChange: (value: string) => void;
     onSearch?: (value: string) => void;
+    onClear?: () => void;
     delay?: number;
 }
 
@@ -15,6 +17,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     value,
     onChange,
     onSearch,
+    onClear,
 }) => {
     const [inputValue, setInputValue] = useState(value || "");
     useEffect(() => {
@@ -37,11 +40,13 @@ const SearchInput: React.FC<SearchInputProps> = ({
         }
     };
 
-    const 
-    handleClearSearch = () => {
+    const handleClearSearch = () => {
         setInputValue("");
         onChange("");
-        if (onSearch) {
+
+        if (onClear) {
+            onClear();
+        } else if (onSearch) {
             onSearch("");
         }
     };
@@ -76,7 +81,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                         onClick={handleClearSearch}
                         aria-label="Clear search"
                     >
-                        X
+                        <HiMiniXMark size={20} />
                     </button>
                 )}
             </div>

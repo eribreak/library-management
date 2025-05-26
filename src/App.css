@@ -9,12 +9,15 @@
 }
 
 .app__container__content {
-    width: 100%;
+    width: calc(100% - 240px);
     padding: 20px;
     margin-left: 240px; 
     transition: margin-left 0.3s ease;
+
 }
 
 .app__container__content--sidebar-collapsed {
     margin-left: 80px;
+    width: calc(100% - 80px);
+    transition: margin-left 0.3s ease;
 }

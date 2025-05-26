@@ -9,7 +9,7 @@
     padding: 20px 24px;
     transition: max-width 0.3s ease;
     position: fixed;
-    top: 70px; /* Chiều cao của header */
+    top: 70px; 
     height: calc(100vh - 70px);
     z-index: 900;
 }

@@ -10,6 +10,7 @@ import { Dialog } from "@chakra-ui/react";
 import CustomButton from "../button/CustomButton";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import styles from "./FormDialog.module.css";
 
 interface FormDialogProps<TFormData = Record<string, unknown>> {
     title: string;
@@ -23,9 +24,12 @@ interface FormDialogProps<TFormData = Record<string, unknown>> {
     onClose?: () => void;
     defaultValues?: Partial<TFormData>;
     schema?: z.ZodType<TFormData>;
+    width?: string;
+    onFormChange?: (data: TFormData) => void;
+    isSubmitting?: boolean; 
 }
 
-export const FormDialog = <
+const FormDialog = <
     TFormData extends Record<string, unknown> = Record<string, unknown>
 >({
     title,
@@ -39,6 +43,9 @@ export const FormDialog = <
     onClose: externalOnClose,
     defaultValues = {},
     schema,
+    width = "600px",
+    onFormChange,
+    isSubmitting = false,
 }: FormDialogProps<TFormData>) => {
     const [internalIsOpen, setInternalIsOpen] = useState(false);
 
@@ -54,19 +61,43 @@ export const FormDialog = <
     }
     const methods = useForm<TFormData>(formOptions);
 
+    
+    React.useEffect(() => {
+        if (onFormChange) {
+            const subscription = methods.watch((data) => {
+                onFormChange(data as TFormData);
+            });
+            return () => subscription.unsubscribe();
+        }
+    }, [methods, onFormChange]);
+
     const handleSubmit: SubmitHandler<TFormData> = (data) => {
         onSubmit(data);
+        
+    };
+
+    const handleOpenChange = (details: { open: boolean }) => {
+        
+        if (!details.open && isSubmitting) {
+            return;
+        }
+
         if (!isControlled) {
-            setInternalIsOpen(false);
-        } else if (externalOnClose) {
+            setInternalIsOpen(details.open);
+        } else if (!details.open && externalOnClose) {
             externalOnClose();
         }
     };
 
-    const handleOpenChange = (details: { open: boolean }) => {
+    const handleCancelClick = () => {
+        
+        if (isSubmitting) {
+            return;
+        }
+
         if (!isControlled) {
-            setInternalIsOpen(details.open);
-        } else if (!details.open && externalOnClose) {
+            setInternalIsOpen(false);
+        } else if (externalOnClose) {
             externalOnClose();
         }
     };
@@ -82,38 +113,41 @@ export const FormDialog = <
             <Dialog.Backdrop />
 
             <Dialog.Positioner>
-                <Dialog.Content>
-                    <Dialog.Header>
-                        <Dialog.Title>{title}</Dialog.Title>
+                <Dialog.Content
+                    maxW={width}
+                    className={styles.bookDetailDialog}
+                >
+                    <Dialog.Header className={styles.dialogHeader}>
+                        <Dialog.Title className={styles.dialogTitle}>
+                            {title}
+                        </Dialog.Title>
                     </Dialog.Header>
 
-                    <FormProvider {...methods}>
-                        <form onSubmit={methods.handleSubmit(handleSubmit)}>
-                            <Dialog.Body>{formFields}</Dialog.Body>
-                            <Dialog.Footer>
-                                <CustomButton
-                                    type="button"
-                                    className="secondary-button"
-                                    onClick={() => {
-                                        if (!isControlled) {
-                                            setInternalIsOpen(false);
-                                        } else if (externalOnClose) {
-                                            externalOnClose();
-                                        }
-                                    }}
-                                >
-                                    {cancelButtonText}
-                                </CustomButton>
-                                <CustomButton
-                                    bg={"var(--primary-color)"}
-                                    type="submit"
-                                    className="primary-button"
-                                >
-                                    {submitButtonText}
-                                </CustomButton>
-                            </Dialog.Footer>
-                        </form>
-                    </FormProvider>
+                    <div className={styles.dialogContent}>
+                        <FormProvider {...methods}>
+                            <form onSubmit={methods.handleSubmit(handleSubmit)}>
+                                <Dialog.Body>{formFields}</Dialog.Body>
+                                <Dialog.Footer className={styles.actionButtons}>
+                                    <CustomButton
+                                        type="button"
+                                        className="secondary-button"
+                                        onClick={handleCancelClick}
+                                        disabled={isSubmitting}
+                                    >
+                                        {cancelButtonText}
+                                    </CustomButton>
+                                    <CustomButton
+                                        bg={"var(--primary-color)"}
+                                        type="submit"
+                                        className="primary-button"
+                                        disabled={isSubmitting}
+                                    >
+                                        {submitButtonText}
+                                    </CustomButton>
+                                </Dialog.Footer>
+                            </form>
+                        </FormProvider>
+                    </div>
                 </Dialog.Content>
             </Dialog.Positioner>
         </Dialog.Root>

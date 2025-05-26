@@ -1,13 +1,18 @@
 import {
+    Box,
+    Flex,
+    Image,
     Table,
     TableBodyProps,
     TableCellProps,
     TableColumnHeaderProps,
     TableHeaderProps,
-    TableRootProps,
     TableRowProps,
+    TableRootProps,
 } from "@chakra-ui/react";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import noDataImage from "@/assets/images/no-data.png";
 
 export type Column<T> = {
     key: keyof T;
@@ -16,6 +21,9 @@ export type Column<T> = {
     headerTextAlign?: string;
     cellAlign?: string;
     width?: string;
+    tableColumnHeaderProps?: TableColumnHeaderProps;
+    tableRowHeaderProps?: TableRowProps;
+    tableCellProps?: TableCellProps;
     overflow?: "hidden" | "visible" | "scroll" | "auto";
     textOverflow?: "ellipsis" | "clip";
     whiteSpace?: "normal" | "nowrap" | "pre" | "pre-wrap" | "pre-line";
@@ -31,6 +39,11 @@ interface CustomTableProps<T> extends Omit<TableRootProps, "columns"> {
     tableHeaderProps?: TableHeaderProps;
     tableRowProps?: TableRowProps;
     tableBodyProps?: TableBodyProps;
+    tableLayout: "fixed" | "auto";
+    initialSortBy?: keyof T | null;
+    initialSortDirection?: "asc" | "desc";
+    onSortChange?: (key: keyof T, direction: "asc" | "desc") => void;
+    getRowClassName?: (row: T) => string;
 }
 
 const CustomTable = <T,>({
@@ -42,10 +55,30 @@ const CustomTable = <T,>({
     tableHeaderProps,
     tableRowProps,
     tableBodyProps,
+    tableLayout,
+    initialSortBy = null,
+    initialSortDirection = "asc",
+    onSortChange,
+    getRowClassName,
     ...tableProps
 }: CustomTableProps<T>) => {
-    const [sortBy, setSortBy] = useState<keyof T | null>(null);
-    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const sortByFromUrl = searchParams.get("sortBy") as keyof T | null;
+    const sortDirFromUrl = searchParams.get("sortDir") as "asc" | "desc" | null;
+
+    const [sortBy, setSortBy] = useState<keyof T | null>(
+        sortByFromUrl || initialSortBy
+    );
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">(
+        sortDirFromUrl || initialSortDirection
+    );
+
+    useEffect(() => {
+        if (onSortChange && sortBy) {
+            onSortChange(sortBy, sortDirection);
+        }
+    }, [sortBy, sortDirection, onSortChange]);
 
     const handleSort = (key: keyof T) => {
         if (sortBy === key) {
@@ -81,7 +114,12 @@ const CustomTable = <T,>({
     }, [data, sortBy, sortDirection]);
 
     return (
-        <Table.Root {...tableProps} style={{ tableLayout: "fixed", width: "100%" }}>
+        <Table.Root
+            zIndex={"1000"}
+            {...tableProps}
+            style={{ tableLayout: tableLayout, width: "100%" }}
+            interactive
+        >
             <Table.Header {...tableHeaderProps}>
                 <Table.Row {...tableRowHeaderProps}>
                     {columns.map((col) => {
@@ -90,6 +128,7 @@ const CustomTable = <T,>({
                             <Table.ColumnHeader
                                 key={String(col.key)}
                                 {...tableColumnHeaderProps}
+                                {...col.tableColumnHeaderProps}
                                 onClick={() =>
                                     col.sortable && handleSort(col.key)
                                 }
@@ -119,35 +158,75 @@ const CustomTable = <T,>({
                 </Table.Row>
             </Table.Header>
             <Table.Body {...tableBodyProps}>
-                {sortedData.map((row, index) => (
-                    <Table.Row key={index} {...tableRowProps}>
-                        {columns.map((col) => (
-                            <Table.Cell
-                                {...tableCellProps}
-                                key={String(col.key)}
-                                w={col.width}
-                                textAlign={col.cellAlign}
-                                bg="white"
-                                overflow={col.overflow}
-                                textOverflow={col.textOverflow}
-                                whiteSpace={col.whiteSpace}
-                                title={col.textOverflow === "ellipsis" ? String(row[col.key]) : undefined}
+                {data.length === 0 ? (
+                    <Table.Row>
+                        <Table.Cell
+                            colSpan={columns.length}
+                            textAlign="center"
+                            py={10}
+                        >
+                            <Flex
+                                direction="column"
+                                align="center"
+                                justify="center"
+                                w="100%"
+                                h={"360px"}
                             >
-                                {(() => {
-                                    if (col.render) {
-                                        return col.render(row);
-                                    } else if (row[col.key] instanceof Date) {
-                                        return (
-                                            row[col.key] as Date
-                                        ).toLocaleString();
-                                    } else {
-                                        return String(row[col.key]);
-                                    }
-                                })()}
-                            </Table.Cell>
-                        ))}
+                                <Image
+                                    src={noDataImage}
+                                    alt="No data"
+                                    objectFit={"contain"}
+                                    width="100px"
+                                    mb={12}
+                                />
+                                <Box
+                                    fontSize="var(--font-size-large)"
+                                    fontWeight={"var(--font-weight-medium)"}
+                                    color="var(--black)"
+                                >
+                                    Không tìm thấy dữ liệu
+                                </Box>
+                            </Flex>
+                        </Table.Cell>
                     </Table.Row>
-                ))}
+                ) : (
+                    sortedData.map((row, index) => (
+                        <Table.Row
+                            key={index}
+                            {...tableRowProps}
+                            className={`table-row ${
+                                getRowClassName ? getRowClassName(row) : ""
+                            }`}
+                        >
+                            {columns.map((col) => (
+                                <Table.Cell
+                                    {...tableCellProps}
+                                    {...col.tableCellProps}
+                                    key={String(col.key)}
+                                    w={col.width}
+                                    textAlign={col.cellAlign}
+                                    overflow={col.overflow}
+                                    textOverflow={col.textOverflow}
+                                    whiteSpace={col.whiteSpace}
+                                >
+                                    {(() => {
+                                        if (col.render) {
+                                            return col.render(row);
+                                        } else if (
+                                            row[col.key] instanceof Date
+                                        ) {
+                                            return (
+                                                row[col.key] as Date
+                                            ).toLocaleString();
+                                        } else {
+                                            return String(row[col.key]);
+                                        }
+                                    })()}
+                                </Table.Cell>
+                            ))}
+                        </Table.Row>
+                    ))
+                )}
             </Table.Body>
         </Table.Root>
     );
