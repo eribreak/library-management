@@ -1,6 +1,7 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, select, takeLatest } from "redux-saga/effects";
 import { adminApi } from "../../services/axios";
 import { toaster } from "@/components/ui/toaster";
+import { RootState } from "../store";
 import {
     fetchAuthors,
     fetchAuthorsSuccess,
@@ -48,12 +49,14 @@ function* fetchAuthorsWorker(
         );
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to fetch authors";
+            (error.response?.data?.message &&
+                "Lỗi khi tải danh sách tác giả") ||
+            "Lỗi khi tải danh sách tác giả";
 
         yield put(fetchAuthorsFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
@@ -72,18 +75,32 @@ function* createAuthorWorker(
         yield put(createAuthorSuccess(response.data.data));
 
         toaster.toast({
-            title: "Success",
-            description: response.data.message || "Author created successfully",
+            title: "Thành công",
+            description:
+                (response.data.message && "Tạo tác giả thành công") ||
+                "Tạo tác giả thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.authors);
+        yield put(
+            fetchAuthors({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response?.data?.message || "Failed to create author";
+            (error instanceof Error &&
+                (error as any).response?.data?.errors?.name &&
+                "Tên tác giả đã tồn tại") ||
+            "Tên tác giả đã tồn tại";
 
         yield put(createAuthorFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
@@ -111,25 +128,37 @@ function* updateAuthorWorker(
         yield put(updateAuthorSuccess(response.data.data));
 
         toaster.toast({
-            title: "Success",
-            description: response.data.message || "Author updated successfully",
+            title: "Thành công",
+            description:
+                (response.data.message && "Cập nhật tác giả thành công") ||
+                "Cập nhật tác giả thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.authors);
+        yield put(
+            fetchAuthors({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response?.data?.message || "Failed to update author";
+            (error.response?.data?.errors?.name && "Tên tác giả đã tồn tại") ||
+            "Tên tác giả đã tồn tại";
 
         yield put(updateAuthorFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
     }
 }
 
-function* deleteAuthorWorker(action: PayloadAction<number>) {
+function* deleteAuthorWorker(action: PayloadAction<number>): SagaIterator {
     try {
         const response = yield call(
             [adminApi, adminApi.deleteAuthor],
@@ -139,18 +168,30 @@ function* deleteAuthorWorker(action: PayloadAction<number>) {
         yield put(deleteAuthorSuccess(action.payload));
 
         toaster.toast({
-            title: "Success",
-            description: response.data.message || "Author deleted successfully",
+            title: "Thành công",
+            description:
+                (response.data.message && "Xóa tác giả thành công") ||
+                "Xóa tác giả thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.authors);
+        yield put(
+            fetchAuthors({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response?.data?.message || "Failed to delete author";
+            (error.response?.data?.message && "Lỗi khi xóa tác giả") ||
+            "Lỗi khi xóa tác giả";
 
         yield put(deleteAuthorFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });

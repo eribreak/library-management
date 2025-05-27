@@ -32,6 +32,10 @@ interface AuthorsState {
     loading: boolean;
     error: string | null;
     pagination: PaginationInfo;
+    isCreating: boolean;
+    isUpdating: boolean;
+    createError: string | null;
+    updateError: string | null;
 }
 
 const initialState: AuthorsState = {
@@ -44,13 +48,17 @@ const initialState: AuthorsState = {
         total_pages: 1,
         per_page: 10,
     },
+    isCreating: false,
+    isUpdating: false,
+    createError: null,
+    updateError: null,
 };
 
 const authorsSlice = createSlice({
     name: "authors",
     initialState,
     reducers: {
-        fetchAuthors: (state, _: PayloadAction<FetchAuthorsParams>) => {
+        fetchAuthors: (state, _action: PayloadAction<FetchAuthorsParams>) => {
             state.loading = true;
             state.error = null;
         },
@@ -71,50 +79,46 @@ const authorsSlice = createSlice({
             state.error = action.payload;
         },
         createAuthor: (state) => {
-            state.loading = true;
-            state.error = null;
+            state.isCreating = true;
+            state.createError = null;
         },
-        createAuthorSuccess: (state, action: PayloadAction<Author>) => {
-            state.authors.push(action.payload);
-            state.loading = false;
-            state.error = null;
+        createAuthorSuccess: (state) => {
+            state.isCreating = false;
+            state.createError = null;
         },
         createAuthorFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.isCreating = false;
+            state.createError = action.payload;
         },
         updateAuthor: (state) => {
-            state.loading = true;
-            state.error = null;
+            state.isUpdating = true;
+            state.updateError = null;
         },
-        updateAuthorSuccess: (state, action: PayloadAction<Author>) => {
-            const index = state.authors.findIndex(
-                (author) => author.id === action.payload.id
-            );
-            if (index !== -1) {
-                state.authors[index] = action.payload;
-            }
-            state.loading = false;
-            state.error = null;
+        updateAuthorSuccess: (state) => {
+            state.isUpdating = false;
+            state.updateError = null;
         },
         updateAuthorFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.isUpdating = false;
+            state.updateError = action.payload;
         },
         deleteAuthor: (state) => {
             state.loading = true;
             state.error = null;
         },
-        deleteAuthorSuccess: (state, action: PayloadAction<number>) => {
-            state.authors = state.authors.filter(
-                (author) => author.id !== action.payload
-            );
+        deleteAuthorSuccess: (state) => {
             state.loading = false;
             state.error = null;
         },
         deleteAuthorFailure: (state, action: PayloadAction<string>) => {
             state.loading = false;
             state.error = action.payload;
+        },
+        clearCreateError: (state) => {
+            state.createError = null;
+        },
+        clearUpdateError: (state) => {
+            state.updateError = null;
         },
     },
 });
@@ -132,6 +136,8 @@ export const {
     deleteAuthor,
     deleteAuthorSuccess,
     deleteAuthorFailure,
+    clearCreateError,
+    clearUpdateError,
 } = authorsSlice.actions;
 
 export const authorsReducer = authorsSlice.reducer;
