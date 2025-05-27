@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CustomTable } from "@/components/common/table";
+import { useSearchParams } from "react-router-dom";
+import CustomTable from "@/components/common/table/CustomTable";
 import { Column } from "@/components/common/table/CustomTable";
 import SearchInput from "@/components/common/search-input/SearchInput";
 import { RootState } from "@/store/store";
@@ -14,45 +15,103 @@ import styles from "./User.module.css";
 import SimplePagination from "@/components/common/pagination/SimplePagination";
 import { format } from "date-fns";
 import { Toaster } from "@/components/ui/toaster";
-import { Badge, Box } from "@chakra-ui/react";
+import { Badge, Box, Center, Spinner, Table } from "@chakra-ui/react";
 import { FaLockOpen, FaLock } from "react-icons/fa6";
+import ConfirmDialog from "@/components/common/dialog/ConfirmDialog";
+import { Tooltip } from "@/components/ui/tooltip";
 
 const User = () => {
     const dispatch = useDispatch();
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const { users, loading, pagination } = useSelector(
         (state: RootState) => state.users
     );
 
-    const [inputValue, setInputValue] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
+    const pageFromUrl = searchParams.get("page");
+    const searchTermFromUrl = searchParams.get("search");
+    const idFromUrl = searchParams.get("id");
+
+    const [inputValue, setInputValue] = useState(searchTermFromUrl || "");
+    const [searchTerm, setSearchTerm] = useState(searchTermFromUrl || "");
+    const [currentPage, setCurrentPage] = useState(
+        pageFromUrl ? parseInt(pageFromUrl) : 1
+    );
     const [itemsPerPage] = useState(7);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [userToUpdate, setUserToUpdate] = useState<{
+        user: UserType;
+        newStatus: string;
+    } | null>(null);
 
     const handleInputChange = (term: string) => {
         setInputValue(term);
     };
 
+    const handleClearSearch = () => {
+        setInputValue("");
+        setSearchTerm("");
+        setCurrentPage(1);
+
+        const params = new URLSearchParams();
+        if (idFromUrl) {
+            params.set("id", idFromUrl);
+        }
+        setSearchParams(params);
+
+        dispatch(
+            fetchUsers({
+                page: 1,
+                perPage: itemsPerPage,
+                searchTerm: "",
+            })
+        );
+    };
+
     const handleSearch = () => {
         setSearchTerm(inputValue);
         setCurrentPage(1);
+
+        const params = new URLSearchParams();
+
+        if (inputValue) {
+            params.set("search", inputValue);
+        }
+
+        setSearchParams(params);
+
+        dispatch(
+            fetchUsers({
+                page: 1,
+                perPage: itemsPerPage,
+                searchTerm: inputValue,
+            })
+        );
     };
 
     const handleToggleUserStatus = (user: UserType) => {
         const newStatus = user.status === "1" || user.status === 1 ? "0" : "1";
-        const confirmMessage =
-            newStatus === "0"
-                ? `Bạn có chắc chắn muốn khóa người dùng "${
-                      user.name || user.email
-                  }"?`
-                : `Bạn có chắc chắn muốn mở khóa người dùng "${
-                      user.name || user.email
-                  }"?`;
 
-        if (window.confirm(confirmMessage)) {
+        setUserToUpdate({ user, newStatus });
+        setConfirmDialogOpen(true);
+
+        const params = new URLSearchParams(searchParams);
+        params.set("id", user.id.toString());
+        setSearchParams(params);
+    };
+
+    const handleConfirmDialogClose = (confirmed: boolean) => {
+        setConfirmDialogOpen(false);
+
+        const params = new URLSearchParams(searchParams);
+        params.delete("id");
+        setSearchParams(params);
+
+        if (confirmed && userToUpdate) {
             dispatch(
                 updateUserStatus({
-                    userId: user.id,
-                    status: newStatus,
+                    userId: userToUpdate.user.id,
+                    status: userToUpdate.newStatus,
                 })
             );
         }
@@ -72,81 +131,72 @@ const User = () => {
             typeof status === "string" ? status : status.toString();
 
         if (statusValue === "1") {
-            return (
-                <Badge
-                    
-                    textAlign={"center"}
-                    className={styles.status_active}
-                >
-                    Hoạt động
-                </Badge>
-            );
+            return <Badge className={styles.status_active}>Hoạt động</Badge>;
         } else {
-            return (
-                <Badge
-                    textAlign={"center"}
-                    className={styles.status_inactive}
-                >
-                    Đã khóa
-                </Badge>
-            );
+            return <Badge className={styles.status_inactive}>Đã khóa</Badge>;
         }
     };
 
-    
     const renderId = (user: UserType) => user.id;
 
     const renderEmployeeCode = (user: UserType) => (
-        <span title={user.employee_code || "N/A"}>
-            {user.employee_code || "N/A"}
-        </span>
+        <Tooltip content={user.employee_code || "N/A"}>
+            <span>{user.employee_code || "N/A"}</span>
+        </Tooltip>
     );
 
     const renderName = (user: UserType) => (
-        <span title={user.full_name || "N/A"}>{user.full_name || "N/A"}</span>
+        <Tooltip content={user.full_name || "N/A"}>
+            <span>{user.full_name || "N/A"}</span>
+        </Tooltip>
     );
 
     const renderGender = (user: UserType) => (
-        <span title={user.gender || "N/A"}>{user.gender || "N/A"}</span>
+        <Tooltip content={user.gender || "N/A"}>
+            <span>{user.gender || "N/A"}</span>
+        </Tooltip>
     );
 
     const renderEmail = (user: UserType) => (
-        <span className={styles.user_email} title={user.email}>
-            {user.email}
-        </span>
+        <Tooltip content={user.email}>
+            <span className={styles.user_email}>{user.email}</span>
+        </Tooltip>
     );
 
     const renderPhoneNumber = (user: UserType) => (
-        <span title={user.phone_number || "N/A"}>
-            {user.phone_number || "N/A"}
-        </span>
+        <Tooltip content={user.phone_number || "N/A"}>
+            <span>{user.phone_number || "N/A"}</span>
+        </Tooltip>
     );
 
     const renderAddress = (user: UserType) => (
-        <span title={user.address || "N/A"}>{user.address || "N/A"}</span>
+        <Tooltip content={user.address || "N/A"}>
+            <span>{user.address || "N/A"}</span>
+        </Tooltip>
     );
 
     const renderBirthDate = (user: UserType) => (
-        <span title={formatDate(user.birth_date)}>
-            {formatDate(user.birth_date)}
-        </span>
+        <Tooltip content={formatDate(user.birth_date)}>
+            <span>{formatDate(user.birth_date)}</span>
+        </Tooltip>
     );
 
     const renderActions = (user: UserType) => {
         const isActive = user.status === "1" || user.status === 1;
         return (
             <div className={styles.column_actions}>
-                <CustomButton
-                    title="Thay đổi trạng thái"
-                    onClick={() => handleToggleUserStatus(user)}
-                    className={`${styles.action_button} ${
-                        isActive
-                            ? styles.action_button__danger
-                            : styles.action_button__success
-                    }`}
-                >
-                    {isActive ? <FaLock /> : <FaLockOpen />}
-                </CustomButton>
+                <Tooltip content="Thay đổi trạng thái">
+                    <CustomButton
+                        onClick={() => handleToggleUserStatus(user)}
+                        className={`${styles.action_button} ${
+                            isActive
+                                ? styles.action_button__danger
+                                : styles.action_button__success
+                        }`}
+                    >
+                        {isActive ? <FaLock /> : <FaLockOpen />}
+                    </CustomButton>
+                </Tooltip>
             </div>
         );
     };
@@ -159,6 +209,15 @@ const User = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
+            tableColumnHeaderProps: {
+                position: "sticky",
+                left: 0,
+            },
+            tableCellProps: {
+                position: "sticky",
+                left: 0,
+                backgroundColor: "white",
+            },
             render: renderId,
         },
         {
@@ -231,6 +290,7 @@ const User = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
+            cellAlign: "center",
             render: (user) => renderStatus(user.status),
         },
         {
@@ -239,6 +299,15 @@ const User = () => {
             headerTextAlign: "center",
             width: "10%",
             cellAlign: "center",
+            tableColumnHeaderProps: {
+                position: "sticky",
+                right: 0,
+            },
+            tableCellProps: {
+                position: "sticky",
+                right: 0,
+                backgroundColor: "white",
+            },
             render: renderActions,
         },
     ];
@@ -257,6 +326,20 @@ const User = () => {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+
+        const params = new URLSearchParams(searchParams);
+
+        if (page > 1) {
+            params.set("page", page.toString());
+        } else {
+            params.delete("page");
+        }
+
+        if (searchTerm) {
+            params.set("search", searchTerm);
+        }
+
+        setSearchParams(params);
     };
 
     useEffect(() => {
@@ -279,16 +362,30 @@ const User = () => {
                     value={inputValue}
                     onChange={handleInputChange}
                     onSearch={handleSearch}
+                    onClear={handleClearSearch}
                     placeholder="Tìm kiếm theo tên, email, MNV..."
                 />
             </Box>
 
             {loading ? (
-                <div className={styles.loading}>Đang tải...</div>
+                <Center h="400px">
+                    <Spinner size="xl" color="var(--primary-color)" />
+                </Center>
             ) : (
                 <>
-                    <Box overflow="auto" borderRadius="8px">
-                        <CustomTable data={users} columns={columns} />
+                    <Box
+                        overflow="auto"
+                        borderRadius="8px"
+                        boxShadow={"0 0 10px 0 rgba(0, 0, 0, 0.1)"}
+                    >
+                        <Table.ScrollArea>
+                            <CustomTable
+                                tableLayout="auto"
+                                data={users}
+                                columns={columns}
+                                className={styles.user_table}
+                            />
+                        </Table.ScrollArea>
                     </Box>
 
                     {users.length > 0 && (
@@ -306,6 +403,20 @@ const User = () => {
                         </div>
                     )}
                 </>
+            )}
+
+            {userToUpdate && (
+                <ConfirmDialog
+                    isOpen={confirmDialogOpen}
+                    onClose={() => handleConfirmDialogClose(false)}
+                    onConfirm={() => handleConfirmDialogClose(true)}
+                    title="Xác nhận thay đổi trạng thái"
+                    description={`Bạn có chắc chắn muốn ${
+                        userToUpdate.newStatus === "1" ? "mở khóa" : "khóa"
+                    } người dùng "${
+                        userToUpdate.user.name || userToUpdate.user.email
+                    }"?`}
+                />
             )}
         </div>
     );

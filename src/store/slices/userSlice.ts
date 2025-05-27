@@ -72,12 +72,11 @@ const userSlice = createSlice({
         },
         updateUserStatus(
             state,
-            _: PayloadAction<{
+            _action: PayloadAction<{
                 userId: number;
                 status: string | number;
             }>
         ) {
-            state.loading = true;
             state.error = null;
         },
         updateUserStatusSuccess(state, action: PayloadAction<User>) {

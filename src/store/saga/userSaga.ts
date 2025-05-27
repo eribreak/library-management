@@ -48,12 +48,14 @@ function* fetchUsersWorker(
         );
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to fetch users";
+            (error.response?.data?.message &&
+                "Lỗi khi lấy danh sách người dùng") ||
+            "Lỗi khi lấy danh sách người dùng";
 
         yield put(fetchUsersFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
@@ -81,19 +83,23 @@ function* updateUserStatusWorker(
 
         yield put(updateUserStatusSuccess(response.data.data));
 
+        const statusText = status === "1" || status === 1 ? "mở khóa" : "khóa";
+
         toaster.toast({
-            title: "Success",
-            description: "User status updated successfully",
+            title: "Thành công",
+            description: `Đã ${statusText} người dùng thành công`,
             status: "success",
         });
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to update user status";
+            (error.response?.data?.message &&
+                "Lỗi khi cập nhật trạng thái người dùng") ||
+            "Lỗi khi cập nhật trạng thái người dùng";
 
         yield put(updateUserStatusFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
