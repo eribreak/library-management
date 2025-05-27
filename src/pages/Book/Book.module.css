@@ -1,0 +1,293 @@
+.page_title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.search_wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+}
+
+.action_buttons {
+    display: flex;
+    gap: 0;
+    justify-content: center;
+}
+
+.action_button {
+    width: 48px;
+    height: 32px;
+    border: 1px solid #d5d5d5;
+    background-color: #fafbfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.action_button_left {
+    border-radius: 8px 0 0 8px;
+}
+
+.action_button_right {
+    border-radius: 0 8px 8px 0;
+}
+
+.action_button:hover {
+    background-color: #f5f6fa;
+}
+
+.action_button img {
+    width: 16px;
+    height: 16px;
+}
+
+.add_button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.add_button:hover {
+    opacity: 0.9;
+}
+
+.pagination_wrapper {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.filter_select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    min-width: 180px;
+}
+
+.filter_select::placeholder  {
+    color: black;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+    font-size: 1rem;
+    color: #666;
+}
+
+.book_thumbnail {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.book_title {
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.book_id {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.book_text_detail {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.status_select {
+    border: 1px solid var(--black);
+    font-size: 0.875rem;
+    display: inline-block;
+    height: 30px;
+    border-radius: var(--border-radius-medium);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Add new class for deleted books */
+.deleted_row {
+    background-color: #f2f2f2;
+    opacity: 1;
+}
+
+.action_button_disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    
+}
+
+.filter_section {
+    background-color: #fff;
+    border-radius: var(--border-radius-large);
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter_title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.filter_group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-width: 170px;
+}
+
+.filter_label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.filter_select {
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--border-radius-medium);
+    min-width: 160px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    background-color: #fff;
+    transition: all 0.2s ease;
+    height: 36px;
+}
+
+.filter_select:hover {
+    border-color: var(--primary-color);
+}
+
+.filter_select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.checkbox_container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.checkbox_container input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.checkbox_container input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox_container label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.filter_buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter_button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius-medium);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    height: 36px;
+}
+
+.filter_button_reset {
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    color: var(--text-secondary);
+}
+
+.filter_button_reset:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.filter_button_apply {
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: #fff;
+}
+
+.filter_button_apply:hover {
+    opacity: 0.9;
+}
+
+.filter_checkbox_group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 36px;
+    margin-left: 0.5rem;
+}
+
+.filter_checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+    border-radius: 4px;
+    border: 1.5px solid #cbd5e1;
+    transition: border 0.2s;
+}
+
+.filter_checkbox_label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    user-select: none;
+    cursor: pointer;
+}
