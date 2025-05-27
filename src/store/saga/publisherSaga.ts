@@ -1,6 +1,7 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, select, takeLatest } from "redux-saga/effects";
 import { adminApi } from "../../services/axios";
 import { toaster } from "@/components/ui/toaster";
+import { RootState } from "../store";
 import {
     fetchPublishers,
     fetchPublishersSuccess,
@@ -52,12 +53,14 @@ function* fetchPublishersWorker(
         );
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to fetch publishers";
+            (error.response?.data?.message &&
+                "Lỗi khi tải danh sách nhà xuất bản") ||
+            "Lỗi khi tải danh sách nhà xuất bản";
 
         yield put(fetchPublishersFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
@@ -76,19 +79,31 @@ function* createPublisherWorker(
         yield put(createPublisherSuccess(response.data.data));
 
         toaster.toast({
-            title: "Success",
+            title: "Thành công",
             description:
-                response.data.message || "Publisher created successfully",
+                (response.data.message && "Tạo nhà xuất bản thành công") ||
+                "Tạo nhà xuất bản thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.publishers);
+        yield put(
+            fetchPublishers({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response?.data?.message || "Failed to create publisher";
+            (error.response?.data?.errors?.name &&
+                "Tên nhà xuất bản đã tồn tại") ||
+            "Tên nhà xuất bản đã tồn tại";
 
         yield put(createPublisherFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
@@ -116,26 +131,38 @@ function* updatePublisherWorker(
         yield put(updatePublisherSuccess(response.data.data));
 
         toaster.toast({
-            title: "Success",
+            title: "Thành công",
             description:
-                response.data.message || "Publisher updated successfully",
+                (response.data.message && "Cập nhật nhà xuất bản thành công") ||
+                "Cập nhật nhà xuất bản thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.publishers);
+        yield put(
+            fetchPublishers({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response?.data?.message || "Failed to update publisher";
+            (error.response?.data?.errors?.name &&
+                "Tên nhà xuất bản đã tồn tại") ||
+            "Tên nhà xuất bản đã tồn tại";
 
         yield put(updatePublisherFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
     }
 }
 
-function* deletePublisherWorker(action: PayloadAction<number>) {
+function* deletePublisherWorker(action: PayloadAction<number>): SagaIterator {
     try {
         const response = yield call(
             [adminApi, adminApi.deletePublisher],
@@ -145,19 +172,30 @@ function* deletePublisherWorker(action: PayloadAction<number>) {
         yield put(deletePublisherSuccess(action.payload));
 
         toaster.toast({
-            title: "Success",
+            title: "Thành công",
             description:
-                response.data.message || "Publisher deleted successfully",
+                (response.data.message && "Xóa nhà xuất bản thành công") ||
+                "Xóa nhà xuất bản thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.publishers);
+        yield put(
+            fetchPublishers({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response?.data?.message || "Failed to delete publisher";
+            (error.response?.data?.message && "Lỗi khi xóa nhà xuất bản") ||
+            "Lỗi khi xóa nhà xuất bản";
 
         yield put(deletePublisherFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });

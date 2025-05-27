@@ -4,7 +4,8 @@ export interface Publisher {
     id: number;
     name: string;
     description: string;
-    [key: string]: string | number;
+    slug?: string;
+    [key: string]: string | number | undefined;
 }
 
 export interface PublisherFormData {
@@ -31,6 +32,10 @@ interface PublishersState {
     loading: boolean;
     error: string | null;
     pagination: PaginationInfo;
+    isCreating: boolean;
+    isUpdating: boolean;
+    createError: string | null;
+    updateError: string | null;
 }
 
 const initialState: PublishersState = {
@@ -43,13 +48,17 @@ const initialState: PublishersState = {
         total_pages: 1,
         per_page: 10,
     },
+    isCreating: false,
+    isUpdating: false,
+    createError: null,
+    updateError: null,
 };
 
 const publishersSlice = createSlice({
     name: "publishers",
     initialState,
     reducers: {
-        fetchPublishers: (state, _action: PayloadAction<FetchPublishersParams>) => {
+        fetchPublishers: (state, _: PayloadAction<FetchPublishersParams>) => {
             state.loading = true;
             state.error = null;
         },
@@ -70,50 +79,46 @@ const publishersSlice = createSlice({
             state.error = action.payload;
         },
         createPublisher: (state) => {
-            state.loading = true;
-            state.error = null;
+            state.isCreating = true;
+            state.createError = null;
         },
-        createPublisherSuccess: (state, action: PayloadAction<Publisher>) => {
-            state.publishers.push(action.payload);
-            state.loading = false;
-            state.error = null;
+        createPublisherSuccess: (state) => {
+            state.isCreating = false;
+            state.createError = null;
         },
         createPublisherFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.isCreating = false;
+            state.createError = action.payload;
         },
         updatePublisher: (state) => {
-            state.loading = true;
-            state.error = null;
+            state.isUpdating = true;
+            state.updateError = null;
         },
-        updatePublisherSuccess: (state, action: PayloadAction<Publisher>) => {
-            const index = state.publishers.findIndex(
-                (publisher) => publisher.id === action.payload.id
-            );
-            if (index !== -1) {
-                state.publishers[index] = action.payload;
-            }
-            state.loading = false;
-            state.error = null;
+        updatePublisherSuccess: (state) => {
+            state.isUpdating = false;
+            state.updateError = null;
         },
         updatePublisherFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.isUpdating = false;
+            state.updateError = action.payload;
         },
         deletePublisher: (state) => {
             state.loading = true;
             state.error = null;
         },
-        deletePublisherSuccess: (state, action: PayloadAction<number>) => {
-            state.publishers = state.publishers.filter(
-                (publisher) => publisher.id !== action.payload
-            );
+        deletePublisherSuccess: (state) => {
             state.loading = false;
             state.error = null;
         },
         deletePublisherFailure: (state, action: PayloadAction<string>) => {
             state.loading = false;
             state.error = action.payload;
+        },
+        clearCreateError: (state) => {
+            state.createError = null;
+        },
+        clearUpdateError: (state) => {
+            state.updateError = null;
         },
     },
 });
@@ -131,6 +136,8 @@ export const {
     deletePublisher,
     deletePublisherSuccess,
     deletePublisherFailure,
+    clearCreateError,
+    clearUpdateError,
 } = publishersSlice.actions;
 
 export const publishersReducer = publishersSlice.reducer;
