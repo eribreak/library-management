@@ -26,13 +26,17 @@ function* fetchOrdersWorker(
             perPage = 10,
             searchTerm = "",
             status,
+            startDate,
+            endDate,
         } = action.payload;
         const response = yield call(
             [adminApi, adminApi.getOrders],
             perPage,
             page,
             searchTerm,
-            status
+            status,
+            startDate,
+            endDate
         );
 
         const pagination: PaginationInfo = response.data.pagination || {
@@ -50,12 +54,14 @@ function* fetchOrdersWorker(
         );
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to fetch orders";
+            (error.response?.data?.message &&
+                "Lỗi khi tải danh sách đơn hàng") ||
+            "Lỗi khi tải danh sách đơn hàng";
 
         yield put(fetchOrdersFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
@@ -70,7 +76,6 @@ function* updateOrderDetailsWorker(
 ): SagaIterator {
     try {
         const { orderId, details } = action.payload;
-
 
         const updateRequest: UpdateOrderRequest = {
             details: details.map((detail) => ({
@@ -90,18 +95,23 @@ function* updateOrderDetailsWorker(
         yield put(updateOrderDetailsSuccess(updatedOrder));
 
         toaster.toast({
-            title: "Success",
-            description: "Order details updated successfully",
+            title: "Thành công",
+            description:
+                (response.data.message &&
+                    "Cập nhật chi tiết đơn hàng thành công") ||
+                "Cập nhật chi tiết đơn hàng thành công",
             status: "success",
         });
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to update order details";
+            (error.response?.data?.message &&
+                "Lỗi khi cập nhật chi tiết đơn hàng") ||
+            "Lỗi khi cập nhật chi tiết đơn hàng";
 
         yield put(updateOrderDetailsFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });

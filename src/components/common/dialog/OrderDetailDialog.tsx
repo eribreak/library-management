@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Dialog } from "@chakra-ui/react";
+import { useSearchParams } from "react-router-dom";
 import {
     OrderDetail,
     UpdateOrderDetailRequest,
@@ -13,6 +14,7 @@ import {
 } from "@/store/slices/orderSlice";
 import styles from "./OrderDetailDialog.module.css";
 import CustomButton from "../button/CustomButton";
+import { format } from "date-fns";
 
 interface OrderDetailDialogProps {
     orderId: number;
@@ -21,10 +23,10 @@ interface OrderDetailDialogProps {
 }
 
 const STATUS_TEXT: Record<string, string> = {
-            "0": "Đang mượn",
-            "1": "Hoàn thành",
-            "2": "Quá hạn",
-        };
+    "0": "Đang mượn",
+    "1": "Hoàn thành",
+    "2": "Quá hạn",
+};
 
 const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
     orderId,
@@ -32,11 +34,13 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
     onClose,
 }) => {
     const dispatch = useDispatch();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { selectedOrder, loading, updateSuccess } = useSelector(
         (state: RootState) => state.orders
     );
     const [updatedDetails, setUpdatedDetails] = useState<OrderDetail[]>([]);
     const [hasChanges, setHasChanges] = useState(false);
+    const firstRenderRef = useRef(true);
 
     const checkDetailChanges = (detail: OrderDetail) => {
         const originalDetail = selectedOrder?.details.find(
@@ -76,7 +80,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
         }
     };
 
-     useEffect(() => {
+    useEffect(() => {
         if (isOpen && selectedOrder?.details) {
             setUpdatedDetails(selectedOrder.details);
             setHasChanges(false);
@@ -93,6 +97,21 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
         }
     }, [updateSuccess, dispatch]);
 
+    useEffect(() => {
+        if (firstRenderRef.current) {
+            firstRenderRef.current = false;
+            return;
+        }
+
+        if (!isOpen) {
+            console.log(
+                "OrderDetailDialog: Removing ID from URL on dialog close"
+            );
+            const params = new URLSearchParams(searchParams);
+            params.delete("id");
+            setSearchParams(params);
+        }
+    }, [isOpen, searchParams, setSearchParams]);
 
     return (
         <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -131,7 +150,14 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                                             Ngày tạo đơn:
                                         </p>
                                         <p className={styles.infoValue}>
-                                            {selectedOrder.created_at}
+                                            {selectedOrder.created_at
+                                                ? format(
+                                                      new Date(
+                                                          selectedOrder.created_at
+                                                      ),
+                                                      "dd/MM/yyyy HH:mm"
+                                                  )
+                                                : ""}
                                         </p>
                                     </div>
                                     <div className={styles.infoItem}>

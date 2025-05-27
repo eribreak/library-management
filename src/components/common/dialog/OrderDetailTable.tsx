@@ -1,26 +1,62 @@
 import { useState, useEffect } from "react";
-import { CustomTable } from "@/components/common/table";
+import CustomTable from "@/components/common/table/CustomTable";
 import { Column } from "@/components/common/table/CustomTable";
 import { OrderDetail as OrderDetailType } from "@/store/slices/orderSlice";
+import styles from "./OrderDetailTable.module.css";
+import { format } from "date-fns";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface OrderDetailTableProps {
     details: OrderDetailType[];
     onUpdateDetails: (updatedDetails: OrderDetailType[]) => void;
+    onSave?: () => void;
 }
+
+const STATUS_PRIORITY: Record<string, number> = {
+    "0": 0,
+    "2": 1,
+    "3": 2,
+    "1": 3,
+};
 
 const OrderDetailTable: React.FC<OrderDetailTableProps> = ({
     details,
     onUpdateDetails,
+    onSave,
 }) => {
     const [localDetails, setLocalDetails] = useState<OrderDetailType[]>([]);
+    const [initialDetails, setInitialDetails] = useState<OrderDetailType[]>([]);
+    const [savedDetails, setSavedDetails] = useState<OrderDetailType[]>([]);
+
+    const today = new Date();
+    const oneWeekBefore = new Date(today);
+    oneWeekBefore.setDate(today.getDate() - 7);
+    const oneWeekAfter = new Date(today);
+    oneWeekAfter.setDate(today.getDate() + 7);
+
+    const minDate = oneWeekBefore.toISOString().split("T")[0];
+    const maxDate = oneWeekAfter.toISOString().split("T")[0];
 
     const handleStatusChange = (id: number, newStatus: string) => {
+        console.log(
+            `Changing status for book ${id} to ${newStatus} (type: ${typeof newStatus})`
+        );
+
         const updatedDetails = localDetails.map((detail) => {
             if (detail.id === id) {
-                const return_date_real =
-                    newStatus === "1" && !detail.return_date_real
-                        ? new Date().toISOString().split("T")[0]
-                        : detail.return_date_real;
+                const isReturnedStatus =
+                    newStatus === "1" ||
+                    newStatus === 1 ||
+                    newStatus === "Đã trả";
+                const return_date_real = isReturnedStatus
+                    ? detail.return_date_real ||
+                      new Date().toISOString().split("T")[0]
+                    : detail.return_date_real;
+
+                console.log(
+                    `Setting return_date_real to ${return_date_real} for book ${id}`
+                );
                 return { ...detail, status: newStatus, return_date_real };
             }
             return detail;
@@ -28,6 +64,36 @@ const OrderDetailTable: React.FC<OrderDetailTableProps> = ({
 
         setLocalDetails(updatedDetails);
         onUpdateDetails(updatedDetails);
+    };
+
+    const isStatusDisabled = (
+        bookId: number,
+        bookStatus: string,
+        optionStatus: string
+    ) => {
+        const initialDetail = initialDetails.find(
+            (detail) => detail.id === bookId
+        );
+        if (!initialDetail) return false;
+
+        const currentDetail = localDetails.find(
+            (detail) => detail.id === bookId
+        );
+        if (!currentDetail) return false;
+
+        const savedDetail = savedDetails.find((detail) => detail.id === bookId);
+
+        const baseStatus = savedDetail
+            ? savedDetail.status
+            : initialDetail.status;
+        const basePriority = STATUS_PRIORITY[baseStatus];
+        const optionPriority = STATUS_PRIORITY[optionStatus];
+
+        if (optionStatus === initialDetail.status) {
+            return false;
+        }
+
+        return optionPriority < basePriority;
     };
 
     const handleReturnDateChange = (id: number, newDate: string) => {
@@ -72,67 +138,145 @@ const OrderDetailTable: React.FC<OrderDetailTableProps> = ({
         </div>
     );
 
-    const renderReturnDateDue = (book: OrderDetailType) => (
-        <div
-            style={{
-                fontWeight: "500",
-                color: "var(--font-color)",
-            }}
-        >
-            {book.return_date_due}
-        </div>
-    );
+    const renderReturnDateDue = (book: OrderDetailType) => {
+        let formatted = book.return_date_due;
+        if (book.return_date_due) {
+            try {
+                formatted = format(
+                    new Date(book.return_date_due),
+                    "dd/MM/yyyy"
+                );
+            } catch {
+                formatted = book.return_date_due;
+            }
+        }
+        return (
+            <div
+                style={{
+                    fontWeight: "500",
+                    color: "var(--font-color)",
+                }}
+            >
+                {formatted}
+            </div>
+        );
+    };
 
-    const renderReturnDateReal = (book: OrderDetailType) => (
-        <div
-            style={{
-                fontWeight: "500",
-                color: book.status === "1" ? "var(--color-success)" : "#6b7280",
-                display: "flex",
-                alignItems: "center",
-            }}
-        >
-            {book.status === "1" ? (
-                <input
-                    type="date"
-                    value={
-                        book.return_date_real ||
-                        new Date().toISOString().split("T")[0]
-                    }
-                    onChange={(e) =>
-                        handleReturnDateChange(book.id, e.target.value)
-                    }
-                    style={{
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        border: "1px solid var(--border-color)",
-                        backgroundColor: "#fff",
-                        fontSize: "0.875rem",
-                    }}
-                />
-            ) : (
-                "-"
-            )}
-        </div>
-    );
+    const renderReturnDateReal = (book: OrderDetailType) => {
+        const isReturnedStatus =
+            book.status === "1" ||
+            book.status === 1 ||
+            book.status === "Đã trả";
+
+        let formatted = book.return_date_real;
+        if (book.return_date_real) {
+            try {
+                formatted = format(
+                    new Date(book.return_date_real),
+                    "dd/MM/yyyy"
+                );
+            } catch {
+                formatted = book.return_date_real;
+            }
+        }
+
+        return (
+            <div
+                style={{
+                    fontWeight: "500",
+                    color: isReturnedStatus
+                        ? "var(--color-success)"
+                        : "#6b7280",
+                    display: "flex",
+                    alignItems: "center",
+                }}
+            >
+                {isReturnedStatus ? (
+                    <>
+                        <DatePicker
+                            selected={
+                                book.return_date_real
+                                    ? new Date(book.return_date_real)
+                                    : null
+                            }
+                            onChange={(date) =>
+                                handleReturnDateChange(
+                                    book.id,
+                                    date
+                                        ? date instanceof Date
+                                            ? date.toISOString().split("T")[0]
+                                            : date
+                                        : ""
+                                )
+                            }
+                            dateFormat="dd/MM/yyyy"
+                            minDate={new Date(minDate)}
+                            maxDate={new Date(maxDate)}
+                            onKeyDown={(e) => {
+                                e.preventDefault();
+                            }}
+                            placeholderText="Chọn ngày"
+                            className={styles["custom-datepicker"]}
+                            isClearable
+                        />
+                    </>
+                ) : (
+                    "-"
+                )}
+            </div>
+        );
+    };
 
     const renderStatus = (book: OrderDetailType) => (
         <select
-            style={{
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: "6px",
-                border: "1px solid #d1d5db",
-                backgroundColor: "#fff",
-                fontSize: "0.875rem",
-            }}
+            className={styles.status_select}
             value={book.status}
             onChange={(e) => handleStatusChange(book.id, e.target.value)}
         >
-            <option value="0">Đang mượn</option>
-            <option value="1">Đã trả</option>
-            <option value="2">Quá hạn</option>
-            <option value="3">Mất sách</option>
+            <option
+                value="0"
+                disabled={isStatusDisabled(book.id, book.status, "0")}
+                className={
+                    isStatusDisabled(book.id, book.status, "0")
+                        ? styles.status_option_disabled
+                        : ""
+                }
+            >
+                Đang mượn
+            </option>
+            <option
+                value="2"
+                disabled={isStatusDisabled(book.id, book.status, "2")}
+                className={
+                    isStatusDisabled(book.id, book.status, "2")
+                        ? styles.status_option_disabled
+                        : ""
+                }
+            >
+                Quá hạn
+            </option>
+            <option
+                value="3"
+                disabled={isStatusDisabled(book.id, book.status, "3")}
+                className={
+                    isStatusDisabled(book.id, book.status, "3")
+                        ? styles.status_option_disabled
+                        : ""
+                }
+            >
+                Mất sách
+            </option>
+            <option
+                value="1"
+                disabled={isStatusDisabled(book.id, book.status, "1")}
+                className={
+                    isStatusDisabled(book.id, book.status, "1")
+                        ? styles.status_option_disabled
+                        : ""
+                }
+            >
+                Đã trả
+            </option>
         </select>
     );
 
@@ -165,13 +309,48 @@ const OrderDetailTable: React.FC<OrderDetailTableProps> = ({
     ];
 
     useEffect(() => {
-        setLocalDetails(details);
+        if (details.length > 0 && initialDetails.length === 0) {
+            setInitialDetails(details);
+            setLocalDetails(details);
+        }
+    }, [details, initialDetails.length]);
+
+    useEffect(() => {
+        const detailsWithReturnDates = details.map((detail) => {
+            const isReturnedStatus =
+                detail.status === "1" ||
+                detail.status === 1 ||
+                detail.status === "Đã trả";
+
+            if (isReturnedStatus && !detail.return_date_real) {
+                console.log(
+                    `Setting return date for book ${detail.id} with status ${detail.status}`
+                );
+                return {
+                    ...detail,
+                    return_date_real: new Date().toISOString().split("T")[0],
+                };
+            }
+            return detail;
+        });
+
+        setLocalDetails(detailsWithReturnDates);
     }, [details]);
+
+    useEffect(() => {
+        if (onSave) {
+            setSavedDetails(details);
+        }
+    }, [onSave, details]);
 
     return (
         <div>
             <div style={{ marginBottom: "20px" }}>
-                <CustomTable data={localDetails} columns={columns} />
+                <CustomTable
+                    tableLayout="fixed"
+                    data={localDetails}
+                    columns={columns}
+                />
             </div>
         </div>
     );
