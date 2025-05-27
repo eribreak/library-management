@@ -26,6 +26,8 @@ export interface FetchEmployeesParams {
     page?: number;
     perPage?: number;
     searchTerm?: string;
+    sortBy?: string;
+    sortDirection?: "asc" | "desc";
 }
 
 interface EmployeesState {
@@ -33,6 +35,13 @@ interface EmployeesState {
     loading: boolean;
     error: string | null;
     pagination: PaginationInfo;
+    sortBy: string | null;
+    sortDirection: "asc" | "desc";
+    isCreating: boolean;
+    isUpdating: boolean;
+    createError: string | null;
+    updateError: string | null;
+    deleteError: string | null;
 }
 
 const initialState: EmployeesState = {
@@ -45,18 +54,32 @@ const initialState: EmployeesState = {
         total_pages: 1,
         per_page: 10,
     },
+    sortBy: null,
+    sortDirection: "asc",
+    isCreating: false,
+    isUpdating: false,
+    createError: null,
+    updateError: null,
+    deleteError: null,
 };
 
 const employeesSlice = createSlice({
     name: "employees",
     initialState,
     reducers: {
-        fetchEmployees: (
-            state,
-            _action: PayloadAction<FetchEmployeesParams>
-        ) => {
-            state.loading = true;
-            state.error = null;
+        fetchEmployees: {
+            reducer: (state, action: PayloadAction<FetchEmployeesParams>) => {
+                state.loading = true;
+                state.error = null;
+
+                if (action.payload.sortBy) {
+                    state.sortBy = action.payload.sortBy;
+                }
+                if (action.payload.sortDirection) {
+                    state.sortDirection = action.payload.sortDirection;
+                }
+            },
+            prepare: (params: FetchEmployeesParams) => ({ payload: params }),
         },
         fetchEmployeesSuccess: (
             state,
@@ -74,51 +97,56 @@ const employeesSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-        createEmployee: (state) => {
-            state.loading = true;
-            state.error = null;
+        createEmployee: {
+            reducer: (state) => {
+                state.isCreating = true;
+                state.createError = null;
+            },
+            prepare: (data: EmployeeFormData) => ({ payload: data }),
         },
-        createEmployeeSuccess: (state, action: PayloadAction<Employee>) => {
-            state.employees.push(action.payload);
-            state.loading = false;
-            state.error = null;
+        createEmployeeSuccess: (state) => {
+            state.isCreating = false;
+            state.createError = null;
         },
         createEmployeeFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.isCreating = false;
+            state.createError = action.payload;
         },
-        updateEmployee: (state) => {
-            state.loading = true;
-            state.error = null;
+        updateEmployee: {
+            reducer: (state) => {
+                state.isUpdating = true;
+                state.updateError = null;
+            },
+            prepare: (data: EmployeeFormData) => ({ payload: data }),
         },
-        updateEmployeeSuccess: (state, action: PayloadAction<Employee>) => {
-            const index = state.employees.findIndex(
-                (employee) => employee.id === action.payload.id
-            );
-            if (index !== -1) {
-                state.employees[index] = action.payload;
-            }
-            state.loading = false;
-            state.error = null;
+        updateEmployeeSuccess: (state) => {
+            state.isUpdating = false;
+            state.updateError = null;
         },
         updateEmployeeFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.isUpdating = false;
+            state.updateError = action.payload;
         },
-        deleteEmployee: (state) => {
-            state.loading = true;
-            state.error = null;
+        deleteEmployee: {
+            reducer: (state) => {
+                state.loading = true;
+                state.deleteError = null;
+            },
+            prepare: (id: number) => ({ payload: id }),
         },
-        deleteEmployeeSuccess: (state, action: PayloadAction<number>) => {
-            state.employees = state.employees.filter(
-                (employee) => employee.id !== action.payload
-            );
+        deleteEmployeeSuccess: (state) => {
             state.loading = false;
-            state.error = null;
+            state.deleteError = null;
         },
         deleteEmployeeFailure: (state, action: PayloadAction<string>) => {
             state.loading = false;
-            state.error = action.payload;
+            state.deleteError = action.payload;
+        },
+        clearCreateError: (state) => {
+            state.createError = null;
+        },
+        clearUpdateError: (state) => {
+            state.updateError = null;
         },
     },
 });
@@ -136,6 +164,8 @@ export const {
     deleteEmployee,
     deleteEmployeeSuccess,
     deleteEmployeeFailure,
+    clearCreateError,
+    clearUpdateError,
 } = employeesSlice.actions;
 
 export const employeesReducer = employeesSlice.reducer;

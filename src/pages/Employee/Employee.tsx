@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import styles from "./Employee.module.css";
 import SearchInput from "../../components/common/search-input/SearchInput";
-import { CustomTable } from "@/components/common/table";
+import CustomTable from "@/components/common/table/CustomTable";
 import { Column } from "@/components/common/table/CustomTable";
 import SimplePagination from "../../components/common/pagination/SimplePagination";
 import { Toaster, toaster } from "@/components/ui/toaster";
@@ -15,25 +16,50 @@ import {
     deleteEmployee,
     Employee as EmployeeType,
     EmployeeFormData,
+    type Employee,
 } from "@/store/slices/employeeSlice";
 import { RootState, AppDispatch } from "@/store/store";
 import EmployeeFormDialog from "@/components/common/dialog/EmployeeFormDialog";
 import CustomButton from "@/components/common/button/CustomButton";
-import { Box } from "@chakra-ui/react";
+import { Box, Center, Spinner } from "@chakra-ui/react";
 import { adminApi } from "@/services/axios";
+import ConfirmDialog from "@/components/common/dialog/ConfirmDialog";
 
 const Employee: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const [searchParams, setSearchParams] = useSearchParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { employees, loading, pagination } = useSelector(
         (state: RootState) => state.employees
     );
 
-    const [inputValue, setInputValue] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(8);
+    const pageFromUrl = searchParams.get("page");
+    const searchTermFromUrl = searchParams.get("search");
+    const idFromUrl = searchParams.get("id");
+
+    const [inputValue, setInputValue] = useState(searchTermFromUrl || "");
+    const [searchTerm, setSearchTerm] = useState(searchTermFromUrl || "");
+    const [currentPage, setCurrentPage] = useState(
+        pageFromUrl ? parseInt(pageFromUrl) : 1
+    );
+    const [sortBy, setSortBy] = useState<keyof EmployeeType | null>(null);
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+    const [itemsPerPage] = useState(8);
     const [importing, setImporting] = useState(false);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [employeeToDelete, setEmployeeToDelete] =
+        useState<EmployeeType | null>(null);
+
+    useEffect(() => {
+        if (idFromUrl) {
+            const employeeId = parseInt(idFromUrl);
+            const employee = employees.find((emp) => emp.id === employeeId);
+
+            if (employee) {
+                console.log(`Selected employee with ID: ${employeeId}`);
+            }
+        }
+    }, [idFromUrl, employees]);
 
     useEffect(() => {
         dispatch(
@@ -41,12 +67,41 @@ const Employee: React.FC = () => {
                 page: currentPage,
                 perPage: itemsPerPage,
                 searchTerm,
+                sortBy: sortBy as string,
+                sortDirection,
             })
         );
-    }, [dispatch, currentPage, itemsPerPage, searchTerm]);
+    }, [
+        dispatch,
+        currentPage,
+        itemsPerPage,
+        searchTerm,
+        sortBy,
+        sortDirection,
+    ]);
 
     const handleInputChange = (term: string) => {
         setInputValue(term);
+    };
+
+    const handleClearSearch = () => {
+        setInputValue("");
+        setSearchTerm("");
+        setCurrentPage(1);
+
+        const params = new URLSearchParams();
+        if (idFromUrl) {
+            params.set("id", idFromUrl);
+        }
+        setSearchParams(params);
+
+        dispatch(
+            fetchEmployees({
+                page: 1,
+                perPage: itemsPerPage,
+                searchTerm: "",
+            })
+        );
     };
 
     const handleCreateEmployee = (data: EmployeeFormData) => {
@@ -58,18 +113,54 @@ const Employee: React.FC = () => {
     };
 
     const handleDeleteEmployee = (employee: EmployeeType) => {
-        if (
-            window.confirm(
-                `Bạn có chắc chắn muốn xóa nhân viên "${employee.full_name}"?`
-            )
-        ) {
-            dispatch(deleteEmployee(employee.id));
+        setEmployeeToDelete(employee);
+        setConfirmDialogOpen(true);
+
+        const params = new URLSearchParams(searchParams);
+        params.set("id", employee.id.toString());
+        setSearchParams(params);
+    };
+
+    const confirmDelete = () => {
+        if (employeeToDelete) {
+            dispatch(deleteEmployee(employeeToDelete.id));
         }
+        setConfirmDialogOpen(false);
+
+        const params = new URLSearchParams(searchParams);
+        params.delete("id");
+        setSearchParams(params);
+    };
+
+    const cancelDelete = () => {
+        setEmployeeToDelete(null);
+        setConfirmDialogOpen(false);
+
+        const params = new URLSearchParams(searchParams);
+        params.delete("id");
+        setSearchParams(params);
     };
 
     const handleSearch = () => {
         setSearchTerm(inputValue);
+
         setCurrentPage(1);
+
+        const params = new URLSearchParams();
+
+        if (inputValue) {
+            params.set("search", inputValue);
+        }
+
+        setSearchParams(params);
+
+        dispatch(
+            fetchEmployees({
+                page: 1,
+                perPage: itemsPerPage,
+                searchTerm: inputValue,
+            })
+        );
     };
 
     const handleImportClick = () => {
@@ -85,7 +176,7 @@ const Employee: React.FC = () => {
 
         try {
             setImporting(true);
-            adminApi.importEmployees(file);
+            await adminApi.importEmployees(file);
 
             toaster.toast({
                 title: "Import thành công",
@@ -100,10 +191,28 @@ const Employee: React.FC = () => {
                     searchTerm,
                 })
             );
-        } catch (error) {
+        } catch (error: unknown) {
+            let detail = "Có lỗi xảy ra khi nhập dữ liệu nhân viên.";
+            interface AxiosErrorWithMessage {
+                response?: {
+                    data?: {
+                        message?: unknown;
+                    };
+                };
+            }
+            const err = error as AxiosErrorWithMessage;
+            const message = err.response?.data?.message;
+            if (typeof message === "object" && message !== null) {
+                detail = Object.entries(message as Record<string, string[]>)
+                    .map(([row, msgs]) => `Dòng ${row}: ${msgs.join(", ")}`)
+                    .join("\n");
+            } else if (typeof message === "string") {
+                detail = message;
+            }
+
             toaster.toast({
                 title: "Import thất bại",
-                description: "Có lỗi xảy ra khi nhập dữ liệu nhân viên.",
+                description: detail,
                 status: "error",
             });
         } finally {
@@ -114,65 +223,107 @@ const Employee: React.FC = () => {
         }
     };
 
+    const renderEmployeeID = (employee: Employee) => {
+        return <div>{employee.id}</div>;
+    };
+
+    const renderEmployeeCode = (employee: Employee) => {
+        return (
+            <div className={styles.employee_code}>{employee.employee_code}</div>
+        );
+    };
+
+    const renderEmployeeName = (employee: Employee) => {
+        return <div className={styles.employee_name}>{employee.full_name}</div>;
+    };
+
+    const renderEmployeeEmail = (employee: Employee) => {
+        return <div className={styles.employee_email}>{employee.email}</div>;
+    };
+    const renderAction = (employee: Employee) => {
+        const handleEditClick = () => {
+            const params = new URLSearchParams(searchParams);
+            params.set("id", employee.id.toString());
+            setSearchParams(params);
+        };
+
+        const handleDialogClose = () => {
+            const params = new URLSearchParams(searchParams);
+            params.delete("id");
+            setSearchParams(params);
+        };
+
+        return (
+            <div className={styles.actions_wrapper}>
+                <div onClick={handleEditClick}>
+                    <EmployeeFormDialog
+                        isEdit={true}
+                        employee={employee}
+                        onSubmit={(data) => {
+                            handleEditSubmit(data);
+                            handleDialogClose();
+                        }}
+                        onDialogClose={handleDialogClose}
+                    />
+                </div>
+
+                <CustomButton
+                    onClick={() => handleDeleteEmployee(employee)}
+                    className={clsx(
+                        styles.action_button,
+                        styles.action_button_right
+                    )}
+                >
+                    <img src={deleteIcon} alt="Delete" />
+                </CustomButton>
+            </div>
+        );
+    };
     const columns: Column<EmployeeType>[] = [
         {
             key: "id",
             header: "ID",
-            render: (employee) => <div>{employee.id}</div>,
+            render: renderEmployeeID,
             width: "10%",
         },
         {
             key: "employee_code",
             header: "Mã nhân viên",
             width: "20%",
-            render: (employee) => (
-                <div className={styles.employee_code}>
-                    {employee.employee_code}
-                </div>
-            ),
+            render: renderEmployeeCode,
         },
         {
             key: "full_name",
             header: "Họ và tên",
-            render: (employee) => (
-                <div className={styles.employee_name}>{employee.full_name}</div>
-            ),
+            render: renderEmployeeName,
         },
         {
             key: "email",
             header: "Email",
-            render: (employee) => (
-                <div className={styles.employee_email}>{employee.email}</div>
-            ),
+            width: "30%",
+            render: renderEmployeeEmail,
         },
         {
             key: "actions",
             header: "Thao tác",
+            width: "15%",
             headerTextAlign: "center",
-            render: (employee) => (
-                <div className={styles.actions_wrapper}>
-                    <EmployeeFormDialog
-                        isEdit={true}
-                        employee={employee}
-                        onSubmit={(data) => handleEditSubmit(data)}
-                    />
-
-                    <CustomButton
-                        onClick={() => handleDeleteEmployee(employee)}
-                        className={clsx(
-                            styles.action_button,
-                            styles.action_button_right
-                        )}
-                    >
-                        <img src={deleteIcon} alt="Delete" />
-                    </CustomButton>
-                </div>
-            ),
+            render: renderAction,
         },
     ];
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+
+        const params = new URLSearchParams(searchParams);
+
+        if (page > 1) {
+            params.set("page", page.toString());
+        } else {
+            params.delete("page");
+        }
+
+        setSearchParams(params);
     };
 
     const totalItems = pagination?.total || 0;
@@ -187,6 +338,14 @@ const Employee: React.FC = () => {
         totalItems
     );
 
+    const handleSortChange = (
+        columnKey: keyof EmployeeType,
+        direction: "asc" | "desc"
+    ) => {
+        setSortBy(columnKey);
+        setSortDirection(direction);
+    };
+
     return (
         <div>
             <Toaster />
@@ -196,6 +355,7 @@ const Employee: React.FC = () => {
                     value={inputValue}
                     onChange={handleInputChange}
                     onSearch={handleSearch}
+                    onClear={handleClearSearch}
                     placeholder="Tìm kiếm theo tên hoặc mã nhân viên..."
                 />
                 <div className={styles.action_buttons}>
@@ -220,13 +380,21 @@ const Employee: React.FC = () => {
                 </div>
             </Box>
             {loading ? (
-                <div className={styles.loading}>Đang tải...</div>
+                <Center h="400px">
+                    <Spinner size="xl" color="var(--primary-color)" />
+                </Center>
             ) : (
                 <>
-                    <Box borderRadius={"8px"} overflow={"hidden"}>
+                    <Box
+                        borderRadius={"8px"}
+                        overflow={"hidden"}
+                        boxShadow={"0 0 10px 0 rgba(0, 0, 0, 0.1)"}
+                    >
                         <CustomTable<EmployeeType>
+                            tableLayout="fixed"
                             data={employees}
                             columns={columns}
+                            onSortChange={handleSortChange}
                         />
                     </Box>
 
@@ -243,6 +411,15 @@ const Employee: React.FC = () => {
                         />
                     </div>
                 </>
+            )}
+            {confirmDialogOpen && employeeToDelete && (
+                <ConfirmDialog
+                    isOpen={confirmDialogOpen}
+                    onClose={cancelDelete}
+                    onConfirm={confirmDelete}
+                    title="Xác nhận xóa"
+                    description={`Bạn có chắc chắn muốn xóa nhân viên "${employeeToDelete.full_name}"?`}
+                />
             )}
         </div>
     );
