@@ -1,4 +1,4 @@
-import { call, put, select, takeLatest } from "redux-saga/effects";
+import { call, put, takeLatest } from "redux-saga/effects";
 import { adminApi } from "../../services/axios";
 import { toaster } from "@/components/ui/toaster";
 import {
@@ -14,7 +14,6 @@ import {
 import { PayloadAction } from "@reduxjs/toolkit";
 import { SagaIterator } from "redux-saga";
 import { PutReviewRequest } from "@/services/api";
-import { RootState } from "../store";
 
 function* fetchReviewsWorker(
     action: PayloadAction<FetchReviewsParams>
@@ -54,7 +53,9 @@ function* fetchReviewsWorker(
         );
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to fetch reviews";
+            (error.response?.data?.message &&
+                "Lỗi khi tải danh sách đánh giá") ||
+            "Lỗi khi tải danh sách đánh giá";
 
         yield put(fetchReviewsFailure(errorMessage));
 
@@ -105,23 +106,11 @@ function* updateReviewStatusWorker(
             description: `Đã cập nhật trạng thái đánh giá thành ${statusText}`,
             status: "success",
         });
-
-        const state: RootState = yield select();
-        const { filterStatus, filterStars, searchTerm, pagination } =
-            state.reviews;
-
-        yield put(
-            fetchReviews({
-                page: pagination.current_page,
-                perPage: pagination.per_page,
-                status: filterStatus,
-                stars: filterStars,
-                searchTerm,
-            })
-        );
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to update review status";
+            (error.response?.data?.message &&
+                "Lỗi khi cập nhật trạng thái đánh giá") ||
+            "Lỗi khi cập nhật trạng thái đánh giá";
 
         yield put(updateReviewStatusFailure(errorMessage));
 

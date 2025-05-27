@@ -77,8 +77,8 @@ const reviewSlice = createSlice({
         fetchReviews(state, action: PayloadAction<FetchReviewsParams>) {
             state.loading = true;
             state.error = null;
-            if (action.payload.status !== undefined) {
-                state.filterStatus = action.payload.status;
+            if (action.payload.statusParam !== undefined) {
+                state.filterStatus = action.payload.statusParam;
             }
             if (action.payload.stars !== undefined) {
                 state.filterStars = action.payload.stars;
@@ -104,9 +104,8 @@ const reviewSlice = createSlice({
         },
         updateReviewStatus(
             state,
-            action: PayloadAction<UpdateReviewStatusPayload>
+            _action: PayloadAction<UpdateReviewStatusPayload>
         ) {
-            state.loading = true;
             state.error = null;
         },
         updateReviewStatusSuccess(state, action: PayloadAction<Review>) {

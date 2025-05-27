@@ -15,8 +15,8 @@
 
 .filter_select {
     border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px 12px;
+    border-radius: var(--border-radius-medium);
+    padding: 8px 4px;
     min-width: 150px;
     font-size: 14px;
 }
@@ -117,23 +117,16 @@
     text-overflow: ellipsis;
 }
 
-
 .select_wrapper {
-    position: relative;
     width: 100%;
-    max-width: 150px;
+    max-width: 200px;
 }
 
 .action_select {
-    appearance: none;
-    background-color: #f8f9fa;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 16px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    padding: 8px 30px 8px 10px;
+    padding: 8px 30px 8px 4px;
+
     width: 100%;
     cursor: pointer;
     font-size: 14px;
@@ -162,19 +155,40 @@
     margin-bottom: 1.5rem;
 }
 
-.review_comment{
+.review_comment {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.review_book{
-        overflow: hidden;
+.review_book {
+    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-.review_user{
-        overflow: hidden;
+.review_user {
+    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.rejected_row {
+    background-color: var(--border-color) !important;
+}
+
+.rejected_status_wrapper {
+    position: relative;
+}
+
+.rejected_select {
+    background-color: var(--border-color) !important;
+    border-color: var(--border-color) !important;
+    color: #000 !important;
+    font-weight: 500;
+}
+
+.status_wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 150px;
 }
