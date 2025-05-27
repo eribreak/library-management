@@ -1,4 +1,3 @@
-// import "@/components/templates/assets/css/login.css";
 import { CustomForm } from "@/components/common/form";
 import { CustomCheckbox } from "@/components/common/form/CustomCheckbox";
 import { CustomInputField } from "@/components/common/form/CustomInputField";
@@ -34,10 +33,6 @@ const formDataArray: DataType[] = [
         label: "Mật khẩu",
         placeholder: "Nhập mật khẩu",
         type: "password",
-    },
-    {
-        name: "savePassword",
-        label: "Ghi nhớ mật khẩu",
     },
 ];
 

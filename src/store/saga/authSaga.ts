@@ -22,7 +22,10 @@ function* handleLogin(action: PayloadAction<AuthLoginRequest>) {
             })
         );
     } catch (error: any) {
-        const errorMessage = error.response.data.error || "Đăng nhập thất bại";
+        const errorMessage =
+            (error.response.data.error === "Tài khoản đã bị chặn" &&
+                "Tài khoản đã bị chặn") ||
+            "Tài khoản hoặc mật khẩu không chính xác";
 
         toaster.toast({
             title: "Đăng nhập thất bại",
