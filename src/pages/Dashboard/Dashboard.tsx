@@ -150,13 +150,17 @@ const Dashboard = () => {
     return (
         <>
             <Box bg="var(--bg-color)">
-                <Heading fontSize={"1.5rem"} fontWeight={"var(--font-weight-bold)"} mb={"1.5rem"}>
-                    Dashboard
+                <Heading
+                    fontSize={"1.5rem"}
+                    fontWeight={"var(--font-weight-bold)"}
+                    mb={"1.5rem"}
+                >
+                    Bảng thống kê
                 </Heading>
 
                 {loading ? (
                     <Center h="400px">
-                        <Spinner size="xl" color="blue.500" />
+                        <Spinner size="xl" color="var(--primary-color)" />
                     </Center>
                 ) : (
                     <Grid
