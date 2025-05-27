@@ -9,8 +9,9 @@ import {
     ChartOptions,
 } from "chart.js";
 import { Pie } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(ArcElement, Tooltip, Legend, Title);
+ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
 
 interface CategoryStat {
     name: string;
@@ -57,7 +58,30 @@ const BooksByCategoryPie: FC<Props> = ({
             title: { display: true, text: title },
             legend: {
                 position: "right",
+
                 display: true,
+                maxWidth: 150,
+                labels: {
+                    font: { size: 12 },
+                    boxWidth: 20,
+
+                    textAlign: "left",
+                },
+            },
+            datalabels: {
+                formatter: (value, ctx) => {
+                    const total = ctx.dataset.data.reduce(
+                        (acc: number, cur: number) => acc + cur,
+                        0
+                    );
+                    const percentage = (value / total) * 100;
+                    return `${percentage.toFixed(1)}%`;
+                },
+                color: "black",
+                font: { size: 12 },
+                textAlign: "left",
+                anchor: "end",
+                align: "start",
             },
             tooltip: {
                 callbacks: {

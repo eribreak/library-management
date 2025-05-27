@@ -116,12 +116,6 @@ const MonthlyBorrowRateChart: React.FC<MonthlyBorrowRateChartProps> = ({
                     text: "Số lượng sách",
                 },
             },
-            x: {
-                title: {
-                    display: true,
-                    text: "Tháng",
-                },
-            },
         },
         interaction: {
             mode: "nearest",
