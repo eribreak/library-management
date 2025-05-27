@@ -3,9 +3,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface Category {
     id: number;
     name: string;
-    slug: string;
     description: string;
-    [key: string]: string | number;
+    slug?: string;
+    [key: string]: string | number | undefined;
 }
 
 export interface CategoryFormData {
@@ -14,23 +14,28 @@ export interface CategoryFormData {
     description: string;
 }
 
-export interface PaginationData {
+export interface PaginationInfo {
     total: number;
     current_page: number;
     total_pages: number;
     per_page: number;
 }
 
-export interface CategoryResponse {
-    data: Category[];
-    pagination: PaginationData;
+export interface FetchCategoriesParams {
+    page?: number;
+    perPage?: number;
+    searchTerm?: string;
 }
 
 interface CategoriesState {
     categories: Category[];
     loading: boolean;
     error: string | null;
-    pagination: PaginationData;
+    pagination: PaginationInfo;
+    isCreating: boolean;
+    isUpdating: boolean;
+    createError: string | null;
+    updateError: string | null;
 }
 
 const initialState: CategoriesState = {
@@ -43,26 +48,26 @@ const initialState: CategoriesState = {
         total_pages: 1,
         per_page: 10,
     },
+    isCreating: false,
+    isUpdating: false,
+    createError: null,
+    updateError: null,
 };
 
 const categoriesSlice = createSlice({
     name: "categories",
     initialState,
     reducers: {
-        fetchCategories: (
-            state,
-            _: PayloadAction<{
-                page?: number;
-                perPage?: number;
-                searchTerm?: string;
-            }>
-        ) => {
+        fetchCategories: (state, _action: PayloadAction<FetchCategoriesParams>) => {
             state.loading = true;
             state.error = null;
         },
         fetchCategoriesSuccess: (
             state,
-            action: PayloadAction<CategoryResponse>
+            action: PayloadAction<{
+                data: Category[];
+                pagination: PaginationInfo;
+            }>
         ) => {
             state.categories = action.payload.data;
             state.pagination = action.payload.pagination;
@@ -74,50 +79,46 @@ const categoriesSlice = createSlice({
             state.error = action.payload;
         },
         createCategory: (state) => {
-            state.loading = true;
-            state.error = null;
+            state.isCreating = true;
+            state.createError = null;
         },
-        createCategorySuccess: (state, action: PayloadAction<Category>) => {
-            state.categories.push(action.payload);
-            state.loading = false;
-            state.error = null;
+        createCategorySuccess: (state) => {
+            state.isCreating = false;
+            state.createError = null;
         },
         createCategoryFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.isCreating = false;
+            state.createError = action.payload;
         },
         updateCategory: (state) => {
-            state.loading = true;
-            state.error = null;
+            state.isUpdating = true;
+            state.updateError = null;
         },
-        updateCategorySuccess: (state, action: PayloadAction<Category>) => {
-            const index = state.categories.findIndex(
-                (category) => category.id === action.payload.id
-            );
-            if (index !== -1) {
-                state.categories[index] = action.payload;
-            }
-            state.loading = false;
-            state.error = null;
+        updateCategorySuccess: (state) => {
+            state.isUpdating = false;
+            state.updateError = null;
         },
         updateCategoryFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.isUpdating = false;
+            state.updateError = action.payload;
         },
         deleteCategory: (state) => {
             state.loading = true;
             state.error = null;
         },
-        deleteCategorySuccess: (state, action: PayloadAction<number>) => {
-            state.categories = state.categories.filter(
-                (category) => category.id !== action.payload
-            );
+        deleteCategorySuccess: (state) => {
             state.loading = false;
             state.error = null;
         },
         deleteCategoryFailure: (state, action: PayloadAction<string>) => {
             state.loading = false;
             state.error = action.payload;
+        },
+        clearCreateError: (state) => {
+            state.createError = null;
+        },
+        clearUpdateError: (state) => {
+            state.updateError = null;
         },
     },
 });
@@ -135,6 +136,8 @@ export const {
     deleteCategory,
     deleteCategorySuccess,
     deleteCategoryFailure,
+    clearCreateError,
+    clearUpdateError,
 } = categoriesSlice.actions;
 
 export const categoriesReducer = categoriesSlice.reducer;

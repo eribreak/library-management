@@ -1,6 +1,7 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, select, takeLatest } from "redux-saga/effects";
 import { adminApi } from "../../services/axios";
 import { toaster } from "@/components/ui/toaster";
+import { RootState } from "../store";
 import {
     fetchCategories,
     fetchCategoriesSuccess,
@@ -57,12 +58,14 @@ function* fetchCategoriesWorker(
         );
     } catch (error: any) {
         const errorMessage =
-            error.response?.data?.message || "Failed to fetch categories";
+            (error.response?.data?.message &&
+                "Lỗi khi tải danh sách danh mục") ||
+            "Lỗi khi tải danh sách danh mục";
 
         yield put(fetchCategoriesFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
@@ -81,19 +84,30 @@ function* createCategoryWorker(
         yield put(createCategorySuccess(response.data.data));
 
         toaster.toast({
-            title: "Success",
+            title: "Thành công",
             description:
-                response.data.message || "Category created successfully",
+                (response.data.message && "Tạo danh mục thành công") ||
+                "Tạo danh mục thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.categories);
+        yield put(
+            fetchCategories({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response?.data?.message || "Failed to create category";
+            (error.response?.data?.errors?.name && "Tên danh mục đã tồn tại") ||
+            "Tên danh mục đã tồn tại";
 
         yield put(createCategoryFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
@@ -120,26 +134,37 @@ function* updateCategoryWorker(
         yield put(updateCategorySuccess(response.data.data));
 
         toaster.toast({
-            title: "Success",
+            title: "Thành công",
             description:
-                response.data.message || "Category updated successfully",
+                (response.data.message && "Cập nhật danh mục thành công") ||
+                "Cập nhật danh mục thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.categories);
+        yield put(
+            fetchCategories({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response?.data?.message || "Failed to update category";
+            (error.response?.data?.errors?.name && "Tên danh mục đã tồn tại") ||
+            "Tên danh mục đã tồn tại";
 
         yield put(updateCategoryFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });
     }
 }
 
-function* deleteCategoryWorker(action: PayloadAction<number>) {
+function* deleteCategoryWorker(action: PayloadAction<number>): SagaIterator {
     try {
         const response = yield call(
             [adminApi, adminApi.deleteCategory],
@@ -149,19 +174,30 @@ function* deleteCategoryWorker(action: PayloadAction<number>) {
         yield put(deleteCategorySuccess(action.payload));
 
         toaster.toast({
-            title: "Success",
+            title: "Thành công",
             description:
-                response.data.message || "Category deleted successfully",
+                (response.data.message && "Xóa danh mục thành công") ||
+                "Xóa danh mục thành công",
             status: "success",
         });
-    } catch (error: any) {
+
+        const state = yield select((state: RootState) => state.categories);
+        yield put(
+            fetchCategories({
+                page: state.pagination.current_page,
+                perPage: state.pagination.per_page,
+                searchTerm: "",
+            })
+        );
+    } catch (error: unknown) {
         const errorMessage =
-            error.response.data?.message || "Failed to delete category";
+            (error.response?.data?.message && "Lỗi khi xóa danh mục") ||
+            "Lỗi khi xóa danh mục";
 
         yield put(deleteCategoryFailure(errorMessage));
 
         toaster.toast({
-            title: "Error",
+            title: "Lỗi",
             description: errorMessage,
             status: "error",
         });

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import styles from "./Category.module.css";
 import SearchInput from "../../components/common/search-input/SearchInput";
-import { CustomTable } from "@/components/common/table";
+import CustomTable from "@/components/common/table/CustomTable";
 import { Column } from "@/components/common/table/CustomTable";
 import SimplePagination from "../../components/common/pagination/SimplePagination";
 import { Toaster } from "@/components/ui/toaster";
+import { Tooltip } from "@/components/ui/tooltip";
 import deleteIcon from "@/assets/images/images/delete-icon.svg";
 import clsx from "clsx";
 import {
@@ -19,72 +21,82 @@ import {
 import { RootState } from "@/store/store";
 import { CategoryFormDialog } from "@/components/common/dialog/CategoryFormDialog";
 import CustomButton from "@/components/common/button/CustomButton";
-import { Box, Flex } from "@chakra-ui/react";
-import { MdDeleteSweep } from "react-icons/md";
+import { Box, Center, Spinner } from "@chakra-ui/react";
+import ConfirmDialog from "@/components/common/dialog/ConfirmDialog";
 
 const Category: React.FC = () => {
-    const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-
     const dispatch = useDispatch();
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const { categories, loading, pagination } = useSelector(
         (state: RootState) => state.categories
     );
 
-    const headerCheckbox = (
-        <input
-            type="checkbox"
-            checked={
-                categories.length > 0 &&
-                selectedCategories.length === categories.length
-            }
-            onChange={(e) => {
-                if (e.target.checked) {
-                    const allIds = categories.map((cat) => cat.id);
-                    setSelectedCategories(allIds);
-                } else {
-                    setSelectedCategories([]);
-                }
-            }}
-            className={styles.category_checkbox}
-        />
-    );
+    const pageFromUrl = searchParams.get("page");
+    const searchTermFromUrl = searchParams.get("search");
+    const idFromUrl = searchParams.get("id");
 
-    const renderCheckbox = (category: CategoryType) => (
-        <input
-            type="checkbox"
-            checked={selectedCategories.includes(category.id)}
-            onChange={(e) => {
-                if (e.target.checked) {
-                    setSelectedCategories([
-                        ...selectedCategories,
-                        category.id,
-                    ]);
-                } else {
-                    setSelectedCategories(
-                        selectedCategories.filter((id) => id !== category.id)
-                    );
-                }
-            }}
-            className={styles.category_checkbox}
-        />
+    const [inputValue, setInputValue] = useState(searchTermFromUrl || "");
+    const [searchTerm, setSearchTerm] = useState(searchTermFromUrl || "");
+    const [currentPage, setCurrentPage] = useState(
+        pageFromUrl ? parseInt(pageFromUrl) : 1
     );
+    const [itemsPerPage] = useState(8);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] =
+        useState<CategoryType | null>(null);
+
+    useEffect(() => {
+        if (idFromUrl) {
+            const categoryId = parseInt(idFromUrl);
+            const category = categories.find((c) => c.id === categoryId);
+
+            if (category) {
+                console.log(`Selected category with ID: ${categoryId}`);
+            }
+        }
+    }, [idFromUrl, categories]);
+
     const renderCategoryName = (category: CategoryType) => (
-        <div className={styles.category_name}>
-            {category.name || "N/A"}
-        </div>
+        <Tooltip content={category.name || "N/A"}>
+            <div className={styles.category_name}>{category.name || "N/A"}</div>
+        </Tooltip>
     );
     const renderCategoryDescription = (category: CategoryType) => (
-        <div className={styles.category_description}>
-            {category.description || "N/A"}
-        </div>
+        <Tooltip content={category.description || "N/A"}>
+            <div className={styles.category_description}>
+                {category.description || "N/A"}
+            </div>
+        </Tooltip>
     );
-    const renderCategoryActions = (category: CategoryType) => (
-                <div className={styles.category_table__action_buttons}>
+    const renderCategoryActions = (category: CategoryType) => {
+        const handleEditClick = () => {
+            const params = new URLSearchParams(searchParams);
+            params.set("id", category.id.toString());
+            setSearchParams(params);
+        };
+
+        const handleDialogClose = () => {
+            console.log("Category handleDialogClose called");
+            const params = new URLSearchParams(searchParams);
+            params.delete("id");
+            setSearchParams(params);
+        };
+
+        return (
+            <div className={styles.category_table__action_buttons}>
+                <div onClick={handleEditClick}>
                     <CategoryFormDialog
                         isEdit={true}
                         category={category}
-                        onSubmit={(data) => handleEditSubmit(data)}
+                        onSubmit={(data) => {
+                            handleEditSubmit(data);
+                            handleDialogClose();
+                        }}
+                        onDialogClose={handleDialogClose}
                     />
+                </div>
+                <Tooltip content="Xóa danh mục">
                     <CustomButton
                         onClick={() => handleDeleteCategory(category)}
                         className={clsx(
@@ -94,15 +106,17 @@ const Category: React.FC = () => {
                     >
                         <img src={deleteIcon} alt="Delete" />
                     </CustomButton>
-                </div>
-            )
+                </Tooltip>
+            </div>
+        );
+    };
 
     const columns: Column<CategoryType>[] = [
         {
-            key: "select",
-            header: headerCheckbox,
-            width: "50px",
-            render: (category) => renderCheckbox(category),
+            key: "id",
+            header: "ID",
+            width: "10%",
+            render: (category) => category.id,
         },
         {
             key: "name",
@@ -125,15 +139,11 @@ const Category: React.FC = () => {
         {
             key: "actions",
             header: "Thao tác",
+            width: "15%",
             headerTextAlign: "center",
             render: (category) => renderCategoryActions(category),
         },
     ];
-
-    const [inputValue, setInputValue] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(7);
 
     useEffect(() => {
         dispatch(
@@ -143,16 +153,51 @@ const Category: React.FC = () => {
                 searchTerm,
             })
         );
-        setSelectedCategories([]);
     }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
     const handleInputChange = (term: string) => {
         setInputValue(term);
     };
 
+    const handleClearSearch = () => {
+        setInputValue("");
+        setSearchTerm("");
+        setCurrentPage(1);
+
+        const params = new URLSearchParams();
+        if (idFromUrl) {
+            params.set("id", idFromUrl);
+        }
+        setSearchParams(params);
+
+        dispatch(
+            fetchCategories({
+                page: 1,
+                perPage: itemsPerPage,
+                searchTerm: "",
+            })
+        );
+    };
+
     const handleSearch = () => {
         setSearchTerm(inputValue);
         setCurrentPage(1);
+
+        const params = new URLSearchParams();
+
+        if (inputValue) {
+            params.set("search", inputValue);
+        }
+
+        setSearchParams(params);
+
+        dispatch(
+            fetchCategories({
+                page: 1,
+                perPage: itemsPerPage,
+                searchTerm: inputValue,
+            })
+        );
     };
 
     const handleAddSubmit = (data: CategoryFormData) => {
@@ -164,9 +209,30 @@ const Category: React.FC = () => {
     };
 
     const handleDeleteCategory = (category: CategoryType) => {
-        if (window.confirm("Bạn có muốn xóa danh mục này không?")) {
-            dispatch(deleteCategory(category.id));
+        setCategoryToDelete(category);
+        setConfirmDialogOpen(true);
+        const params = new URLSearchParams(searchParams);
+        params.set("id", category.id.toString());
+        setSearchParams(params);
+    };
+
+    const confirmDelete = () => {
+        if (categoryToDelete) {
+            dispatch(deleteCategory(categoryToDelete.id));
+            setCategoryToDelete(null);
         }
+        setConfirmDialogOpen(false);
+        const params = new URLSearchParams(searchParams);
+        params.delete("id");
+        setSearchParams(params);
+    };
+
+    const cancelDelete = () => {
+        setCategoryToDelete(null);
+        setConfirmDialogOpen(false);
+        const params = new URLSearchParams(searchParams);
+        params.delete("id");
+        setSearchParams(params);
     };
 
     const totalPages = pagination.total_pages;
@@ -178,19 +244,16 @@ const Category: React.FC = () => {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
-    };
 
-    const handleBulkDelete = () => {
-        if (window.confirm("Bạn có muốn xóa những danh mục đã chọn không?")) {
-            selectedCategories.forEach((id) => {
-                dispatch(deleteCategory(id));
-            });
-            setSelectedCategories([]);
+        const params = new URLSearchParams(searchParams);
+
+        if (page > 1) {
+            params.set("page", page.toString());
+        } else {
+            params.delete("page");
         }
-    };
 
-    const handleUnselectAll = () => {
-        setSelectedCategories([]);
+        setSearchParams(params);
     };
 
     return (
@@ -204,6 +267,7 @@ const Category: React.FC = () => {
                     value={inputValue}
                     onChange={handleInputChange}
                     onSearch={handleSearch}
+                    onClear={handleClearSearch}
                 />
                 <CategoryFormDialog
                     isEdit={false}
@@ -211,33 +275,19 @@ const Category: React.FC = () => {
                 />
             </div>
 
-            <Flex gap={2}>
-                <CustomButton
-                    title="Xóa nhiều"
-                    onClick={handleBulkDelete}
-                    disabled={selectedCategories.length === 0}
-                    className={styles.bulk_delete_button}
-                >
-                    <MdDeleteSweep />
-                </CustomButton>
-
-                {selectedCategories.length > 0 && (
-                    <CustomButton
-                        onClick={handleUnselectAll}
-                        bg="gray.500"
-                        _hover={{ bg: "gray.600" }}
-                    >
-                        Bỏ chọn tất cả ({selectedCategories.length})
-                    </CustomButton>
-                )}
-            </Flex>
-
             {loading ? (
-                <div className={styles.loading}>Đang tải...</div>
+                <Center h="400px">
+                    <Spinner size="xl" color="var(--primary-color)" />
+                </Center>
             ) : (
                 <>
-                    <Box borderRadius={"8px"} overflow={"hidden"}>
+                    <Box
+                        borderRadius={"8px"}
+                        overflow={"hidden"}
+                        boxShadow={"0 0 10px 0 rgba(0, 0, 0, 0.1)"}
+                    >
                         <CustomTable<CategoryType>
+                            tableLayout="fixed"
                             data={categories}
                             columns={columns}
                         />
@@ -256,6 +306,16 @@ const Category: React.FC = () => {
                         />
                     </div>
                 </>
+            )}
+
+            {confirmDialogOpen && (
+                <ConfirmDialog
+                    isOpen={confirmDialogOpen}
+                    onConfirm={confirmDelete}
+                    onClose={cancelDelete}
+                    title="Xác nhận xóa"
+                    description={`Bạn có chắc chắn muốn xóa danh mục "${categoryToDelete?.name}"?`}
+                />
             )}
         </div>
     );
