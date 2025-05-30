@@ -17,6 +17,7 @@ import {
     deletePublisher,
     Publisher as PublisherType,
     PublisherFormData,
+    resetPublisherState,
 } from "@/store/slices/publisherSlice";
 import { RootState } from "@/store/store";
 import PublisherFormDialog from "@/components/common/dialog/PublisherFormDialog";
@@ -45,6 +46,10 @@ const Publisher: React.FC = () => {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [publisherToDelete, setPublisherToDelete] =
         useState<PublisherType | null>(null);
+
+    useEffect(() => {
+        dispatch(resetPublisherState());
+    }, [dispatch]);
 
     useEffect(() => {
         if (idFromUrl) {

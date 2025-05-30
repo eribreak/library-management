@@ -26,8 +26,9 @@ import {
     Spinner,
 } from "@chakra-ui/react";
 import { Toaster } from "@/components/ui/toaster";
-import { TbFilterCancel, TbFilterCheck } from "react-icons/tb";
 import { Tooltip } from "@/components/ui/tooltip";
+import { RiResetLeftLine } from "react-icons/ri";
+import { IoSearchSharp } from "react-icons/io5";
 
 const Order = () => {
     const dispatch = useDispatch();
@@ -435,15 +436,14 @@ const Order = () => {
                                                 alignItems={"center"}
                                                 gap={2}
                                             >
-                                                <TbFilterCancel />{" "}
+                                                <RiResetLeftLine />{" "}
                                                 <div>Đặt lại</div>
                                             </Box>
                                         </Tooltip>
                                     </Button>
                                     <Button
-                                        colorScheme={
-                                            isFilterApplied ? "green" : "blue"
-                                        }
+                                        bg={"green.500"}
+                                        border={"none"}
                                         onClick={handleApplyFilter}
                                         className={
                                             styles.filter_button +
@@ -457,7 +457,8 @@ const Order = () => {
                                                 alignItems={"center"}
                                                 gap={2}
                                             >
-                                                <TbFilterCheck /> <div>Lọc</div>
+                                                <IoSearchSharp />
+                                                <div>Lọc</div>
                                             </Box>
                                         </Tooltip>
                                     </Button>

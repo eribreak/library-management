@@ -189,8 +189,9 @@ function* deletePublisherWorker(action: PayloadAction<number>): SagaIterator {
         );
     } catch (error: unknown) {
         const errorMessage =
-            (error.response?.data?.message && "Lỗi khi xóa nhà xuất bản") ||
-            "Lỗi khi xóa nhà xuất bản";
+            (error.response?.data?.message &&
+                "Không thể xóa vì có sách đang có nhà xuất bản này") ||
+            "Không thể xóa vì có sách đang có nhà xuất bản này";
 
         yield put(deletePublisherFailure(errorMessage));
 

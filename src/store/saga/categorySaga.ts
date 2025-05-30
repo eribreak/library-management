@@ -191,8 +191,9 @@ function* deleteCategoryWorker(action: PayloadAction<number>): SagaIterator {
         );
     } catch (error: unknown) {
         const errorMessage =
-            (error.response?.data?.message && "Lỗi khi xóa danh mục") ||
-            "Lỗi khi xóa danh mục";
+            (error.response?.data?.message &&
+                "Không thể xóa vì có sách đang có danh mục này") ||
+            "Không thể xóa vì có sách đang có danh mục này";
 
         yield put(deleteCategoryFailure(errorMessage));
 

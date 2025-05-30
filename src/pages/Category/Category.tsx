@@ -17,6 +17,7 @@ import {
     deleteCategory,
     Category as CategoryType,
     CategoryFormData,
+    resetCategoryState,
 } from "@/store/slices/categorySlice";
 import { RootState } from "@/store/store";
 import { CategoryFormDialog } from "@/components/common/dialog/CategoryFormDialog";
@@ -45,6 +46,10 @@ const Category: React.FC = () => {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] =
         useState<CategoryType | null>(null);
+
+    useEffect(() => {
+        dispatch(resetCategoryState());
+    }, [dispatch]);
 
     useEffect(() => {
         if (idFromUrl) {

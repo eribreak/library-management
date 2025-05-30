@@ -120,6 +120,16 @@ const authorsSlice = createSlice({
         clearUpdateError: (state) => {
             state.updateError = null;
         },
+        resetAuthorState: (state) => {
+            state.authors = [];
+            state.loading = true;
+            state.error = null;
+            state.pagination = initialState.pagination;
+            state.isCreating = false;
+            state.isUpdating = false;
+            state.createError = null;
+            state.updateError = null;
+        },
     },
 });
 
@@ -138,6 +148,7 @@ export const {
     deleteAuthorFailure,
     clearCreateError,
     clearUpdateError,
+    resetAuthorState,
 } = authorsSlice.actions;
 
 export const authorsReducer = authorsSlice.reducer;

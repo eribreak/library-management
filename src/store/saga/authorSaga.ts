@@ -185,8 +185,9 @@ function* deleteAuthorWorker(action: PayloadAction<number>): SagaIterator {
         );
     } catch (error: unknown) {
         const errorMessage =
-            (error.response?.data?.message && "Lỗi khi xóa tác giả") ||
-            "Lỗi khi xóa tác giả";
+            (error.response?.data?.message &&
+                "Không thể xóa vì có sách đang có tác giả này") ||
+            "Không thể xóa vì có sách đang có tác giả này";
 
         yield put(deleteAuthorFailure(errorMessage));
 

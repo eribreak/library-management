@@ -223,10 +223,6 @@ const Employee: React.FC = () => {
         }
     };
 
-    const renderEmployeeID = (employee: Employee) => {
-        return <div>{employee.id}</div>;
-    };
-
     const renderEmployeeCode = (employee: Employee) => {
         return (
             <div className={styles.employee_code}>{employee.employee_code}</div>
@@ -280,12 +276,6 @@ const Employee: React.FC = () => {
         );
     };
     const columns: Column<EmployeeType>[] = [
-        {
-            key: "id",
-            header: "ID",
-            render: renderEmployeeID,
-            width: "10%",
-        },
         {
             key: "employee_code",
             header: "Mã nhân viên",

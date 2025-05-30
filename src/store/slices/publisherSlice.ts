@@ -120,6 +120,16 @@ const publishersSlice = createSlice({
         clearUpdateError: (state) => {
             state.updateError = null;
         },
+        resetPublisherState: (state) => {
+            state.publishers = [];
+            state.loading = true;
+            state.error = null;
+            state.pagination = initialState.pagination;
+            state.isCreating = false;
+            state.isUpdating = false;
+            state.createError = null;
+            state.updateError = null;
+        },
     },
 });
 
@@ -138,6 +148,7 @@ export const {
     deletePublisherFailure,
     clearCreateError,
     clearUpdateError,
+    resetPublisherState,
 } = publishersSlice.actions;
 
 export const publishersReducer = publishersSlice.reducer;

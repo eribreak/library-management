@@ -58,7 +58,10 @@ const categoriesSlice = createSlice({
     name: "categories",
     initialState,
     reducers: {
-        fetchCategories: (state, _action: PayloadAction<FetchCategoriesParams>) => {
+        fetchCategories: (
+            state,
+            _action: PayloadAction<FetchCategoriesParams>
+        ) => {
             state.loading = true;
             state.error = null;
         },
@@ -120,6 +123,16 @@ const categoriesSlice = createSlice({
         clearUpdateError: (state) => {
             state.updateError = null;
         },
+        resetCategoryState: (state) => {
+            state.categories = [];
+            state.loading = true;
+            state.error = null;
+            state.pagination = initialState.pagination;
+            state.isCreating = false;
+            state.isUpdating = false;
+            state.createError = null;
+            state.updateError = null;
+        },
     },
 });
 
@@ -138,6 +151,7 @@ export const {
     deleteCategoryFailure,
     clearCreateError,
     clearUpdateError,
+    resetCategoryState,
 } = categoriesSlice.actions;
 
 export const categoriesReducer = categoriesSlice.reducer;

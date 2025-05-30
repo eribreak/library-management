@@ -17,6 +17,7 @@ import {
     deleteAuthor,
     Author as AuthorType,
     AuthorFormData,
+    resetAuthorState,
 } from "@/store/slices/authorSlice";
 import { RootState } from "@/store/store";
 import AuthorFormDialog from "@/components/common/dialog/AuthorFormDialog";
@@ -47,6 +48,10 @@ const Author: React.FC = () => {
     const [authorToDelete, setAuthorToDelete] = useState<AuthorType | null>(
         null
     );
+
+    useEffect(() => {
+        dispatch(resetAuthorState());
+    }, [dispatch]);
 
     useEffect(() => {
         if (idFromUrl) {
