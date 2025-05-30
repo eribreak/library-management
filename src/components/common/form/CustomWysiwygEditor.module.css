@@ -49,3 +49,8 @@
     border-color: var(--chakra-colors-blue-500);
     box-shadow: 0 0 0 1px var(--chakra-colors-blue-500);
 }
+
+.wysiwygEditor_error {
+    border: 1px solid var(--color-error);
+    border-radius: var(--border-radius-medium);
+}

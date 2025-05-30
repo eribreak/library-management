@@ -83,7 +83,3 @@ textarea[aria-invalid="true"]:focus {
     border-color: var(--error-color);
 }
 
-div[class="rsw-editor"] {
-    --focus-ring-color: var(--error-color);
-    border-color: var(--error-color);
-}

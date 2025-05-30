@@ -32,12 +32,12 @@ export const bookSchema = z.object({
     short_description: z
         .string()
         .min(1, "Mô tả ngắn là bắt buộc")
-        .max(65535, "Mô tả ngắn không được vượt quá 65535 ký tự")
+        .max(10000, "Mô tả ngắn không được vượt quá 10.000 ký tự")
         .optional(),
     long_description: z
         .string()
         .min(1, "Mô tả chi tiết là bắt buộc")
-        .max(16777215, "Mô tả chi tiết không được vượt quá 16777215 ký tự")
+        .max(20000, "Mô tả chi tiết không được vượt quá 20.000 ký tự")
         .optional(),
     page_count: createNumberSchema("Số trang phải là số dương").optional(),
 

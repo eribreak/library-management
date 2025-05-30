@@ -46,7 +46,8 @@ export const ToasterProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const [toasts, setToasts] = useState<Toast[]>([]);
-    const toastsTimeoutRef = useRef<{ [id: string]: NodeJS.Timeout }>({});
+    const toastsTimeoutRef = useRef<{ [id: string]: number }>({});
+    const [hoveredToastId, setHoveredToastId] = useState<string | null>(null);
 
     useEffect(() => {
         return () => {
@@ -71,27 +72,54 @@ export const ToasterProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setToasts((currentToasts) => [...currentToasts, newToast]);
 
-        toastsTimeoutRef.current[id] = setTimeout(() => {
-            removeToast(id);
-        }, 3000);
+        const scheduleRemoval = () => {
+            toastsTimeoutRef.current[id] = setTimeout(() => {
+                if (hoveredToastId !== id) {
+                    removeToast(id);
+                }
+            }, 3000);
+        };
+
+        scheduleRemoval();
     };
 
     useEffect(() => {
         globalToastCallback = toast;
+
+        toasts.forEach((toastItem) => {
+            if (toastsTimeoutRef.current[toastItem.id]) {
+                clearTimeout(toastsTimeoutRef.current[toastItem.id]);
+            }
+
+            if (hoveredToastId !== toastItem.id) {
+                toastsTimeoutRef.current[toastItem.id] = setTimeout(() => {
+                    if (hoveredToastId !== toastItem.id) {
+                        removeToast(toastItem.id);
+                    }
+                }, 3000);
+            }
+        });
+
         return () => {
             globalToastCallback = null;
         };
-    }, []);
+    }, [hoveredToastId, toasts, removeToast, toast]);
 
     return (
         <ToasterContext.Provider value={{ toasts, toast, removeToast }}>
             {children}
-            <Toaster />
+            <Toaster
+                hoveredToastId={hoveredToastId}
+                setHoveredToastId={setHoveredToastId}
+            />
         </ToasterContext.Provider>
     );
 };
 
-export const Toaster: React.FC = () => {
+export const Toaster: React.FC<{
+    hoveredToastId: string | null;
+    setHoveredToastId: (id: string | null) => void;
+}> = ({ setHoveredToastId }) => {
     const { toasts, removeToast } = useToaster();
 
     const getToastStyles = (status: ToastStatus): React.CSSProperties => {
@@ -103,7 +131,8 @@ export const Toaster: React.FC = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            maxWidth: "400px",
+            width: "350px",
+
             position: "relative",
             animation: "slideInRight 0.3s ease-out forwards",
         };
@@ -144,7 +173,7 @@ export const Toaster: React.FC = () => {
         <div
             style={{
                 position: "fixed",
-                top: "20px",
+                top: "70px",
                 right: "20px",
                 zIndex: 9999,
                 display: "flex",
@@ -167,7 +196,12 @@ export const Toaster: React.FC = () => {
         `}
             </style>
             {toasts.map((toast) => (
-                <div key={toast.id} style={getToastStyles(toast.status)}>
+                <div
+                    key={toast.id}
+                    style={getToastStyles(toast.status)}
+                    onMouseEnter={() => setHoveredToastId(toast.id)}
+                    onMouseLeave={() => setHoveredToastId(null)}
+                >
                     <div>
                         <div
                             style={{ fontWeight: "bold", marginBottom: "4px" }}

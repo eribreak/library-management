@@ -3,6 +3,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import Editor from "react-simple-wysiwyg";
 import { CSSProperties } from "react";
 import styles from "./CustomWysiwygEditor.module.css";
+import clsx from "clsx";
 
 export interface CustomWysiwygEditorProps {
     name: string;
@@ -45,8 +46,14 @@ export const CustomWysiwygEditor = ({
                 name={name}
                 control={control}
                 render={({ field }) => (
-                    <div className={styles.wysiwygEditor} style={customStyle}>
-                        <Editor
+                    <div
+                        className={clsx(styles.wysiwygEditor, {
+                            [styles.wysiwygEditor_error]: error,
+                        })}
+                        style={customStyle}
+                    >
+                        <Editor 
+                            
                             value={field.value || ""}
                             onChange={(e) => field.onChange(e.target.value)}
                         />

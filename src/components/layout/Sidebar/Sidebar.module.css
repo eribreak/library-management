@@ -68,6 +68,11 @@
     visibility: hidden;
 }
 
+.text_show {
+    text-wrap: nowrap;
+    overflow: hidden;
+}
+
 .sidebar__nav_item_active {
     background-color: #4880ff;
     color: white;

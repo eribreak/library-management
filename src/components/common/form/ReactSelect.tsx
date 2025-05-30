@@ -27,7 +27,7 @@ export const ReactSelect = ({
     required = false,
     isMulti = false,
     isSearchable = true,
-    isClearable = true,
+    isClearable = false,
 }: ReactSelectProps) => {
     const {
         control,
@@ -101,7 +101,7 @@ export const ReactSelect = ({
                     />
                 )}
             />
-            {error && <Field.ErrorText>{error}</Field.ErrorText>}
+            {error && <Field.ErrorText position={"absolute"} bottom={"-20px"}>{error}</Field.ErrorText>}
         </Field.Root>
     );
 };

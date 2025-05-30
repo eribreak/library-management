@@ -75,7 +75,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
             <div className={styles["pagination-info"]}>
                 {totalItems > 0 ? (
                     <span>
-                        Hiện từ {startIndex} đến {endIndex} của trên tổng số
+                        Hiện từ {startIndex} đến {endIndex} trên tổng số
                         lượng: {totalItems} (Trang {currentPage}/{totalPages})
                     </span>
                 ) : (

@@ -5,7 +5,11 @@ export const name = z
     .min(1, "Tên là bắt buộc")
     .max(100, "Tên tôi đa 100 ký tự")
     .trim();
-export const description = z.string().min(1, "Mô tả là bắt buộc").trim();
+export const description = z
+    .string()
+    .min(1, "Mô tả là bắt buộc")
+    .max(255, "Mô tả tối đa 255 ký tự")
+    .trim();
 
 export const email = z
     .string()
@@ -16,7 +20,7 @@ export const email = z
 
 export const password = z
     .string()
-    .min(8, "Mật khẩu là bắt buộc")
+    .min(1, "Mật khẩu là bắt buộc")
     .max(100, "Mật khẩu tối đa 100 ký tự")
     .trim()
     .optional();
@@ -24,7 +28,7 @@ export const password = z
 export const employee_code = z
     .string()
     .min(1, "Mã nhân viên không được để trống")
-    .max(20, "Mã nhân viên tối đa 20 ký tự")
+    .max(5, "Mã nhân viên tối đa 5 ký tự")
     .trim()
     .regex(
         /^K\d{4}$/,

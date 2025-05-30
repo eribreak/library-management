@@ -8,7 +8,7 @@
 .header {
     height: 70px;
     background-color: var(--white);
-    max-width: 1440px;
+    max-width: 100%;
     margin: 0 auto;
     border-bottom: 1px solid #e8e8e8;
     display: flex;

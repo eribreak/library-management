@@ -49,7 +49,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/svg/black-dashboard.svg"
                         alt="Dashboard"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Trang chủ
                     </span>
                 </Link>
@@ -66,7 +66,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/contact-icon.svg"
                         alt="Employees management"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Nhân viên
                     </span>
                 </Link>
@@ -83,7 +83,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/team-icon.svg"
                         alt="Users management"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Người dùng
                     </span>
                 </Link>
@@ -100,7 +100,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/team-icon.svg"
                         alt="Authors management"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Tác giả
                     </span>
                 </Link>
@@ -119,7 +119,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/product-stock-icon.svg"
                         alt="Books management"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Sách
                     </span>
                 </Link>
@@ -136,7 +136,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/calendar-icon.svg"
                         alt="Publishers management"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Nhà xuất bản
                     </span>
                 </Link>
@@ -153,7 +153,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/table-icon.svg"
                         alt="Categories management"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Thể loại
                     </span>
                 </Link>
@@ -170,7 +170,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/invoice-icon.svg"
                         alt="Borrowed books management"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Đơn mượn
                     </span>
                 </Link>
@@ -187,7 +187,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/svg/inbox.svg"
                         alt="Rates management"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Đánh giá
                     </span>
                 </Link>
@@ -205,7 +205,7 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed = false }) => {
                         src="/src/assets/images/images/logout-icon.svg"
                         alt="Logout"
                     />
-                    <span className={isCollapsed ? styled.text_hidden : ""}>
+                    <span className={isCollapsed ? styled.text_hidden : styled.text_show}>
                         Đăng xuất
                     </span>
                 </a>

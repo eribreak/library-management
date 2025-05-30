@@ -96,7 +96,7 @@ export const CustomMultiSelect = ({
                     );
                 }}
             />
-            {error && <Field.ErrorText>{error}</Field.ErrorText>}
+            {error && <Field.ErrorText position={"absolute"} bottom={"-20px"}>{error}</Field.ErrorText>}
         </Field.Root>
     );
 };
