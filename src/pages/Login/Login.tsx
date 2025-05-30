@@ -74,9 +74,6 @@ const Login = () => {
             <div className={styled.container}>
                 <div>
                     <h1 className={styled.title}>Đăng nhập vào tài khoản</h1>
-                    <p className={styled.subtitle}>
-                        Vui lòng nhập địa chỉ email và mật khẩu để tiếp tục
-                    </p>
                 </div>
                 <CustomForm<LoginSchemaType>
                     schema={loginSchema}
