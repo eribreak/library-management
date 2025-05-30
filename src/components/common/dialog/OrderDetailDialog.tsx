@@ -104,9 +104,6 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
         }
 
         if (!isOpen) {
-            console.log(
-                "OrderDetailDialog: Removing ID from URL on dialog close"
-            );
             const params = new URLSearchParams(searchParams);
             params.delete("id");
             setSearchParams(params);

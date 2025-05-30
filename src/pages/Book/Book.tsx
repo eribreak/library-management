@@ -105,14 +105,12 @@ const Book = () => {
 
     useEffect(() => {
         if (showDialog && !dialogOpenRef.current && currentBook?.id) {
-            console.log("Opening dialog with book ID:", currentBook.id);
             const params = new URLSearchParams(searchParams);
             params.set("id", currentBook.id.toString());
             setSearchParams(params);
         }
 
         if (!showDialog && dialogOpenRef.current) {
-            console.log("Closing dialog, removing ID from URL");
             const params = new URLSearchParams(searchParams);
             params.delete("id");
             setSearchParams(params);
@@ -154,8 +152,6 @@ const Book = () => {
             categoryIdFromUrl ||
             includeDeletedFromUrl
         ) {
-            console.log("Initializing filters from URL parameters");
-
             setIsFilterApplied(
                 !!(
                     authorIdFromUrl ||
@@ -270,16 +266,6 @@ const Book = () => {
     };
 
     const handleEditBook = (book: BookType) => {
-        console.log("Editing book:", {
-            book,
-            category: book.category,
-            author: book.author,
-            publisher: book.publisher,
-            page: book.page,
-            published_year: book.published_year,
-            quantity: book.quantity,
-        });
-
         const processedBook = {
             ...book,
 
@@ -310,7 +296,6 @@ const Book = () => {
 
             page_count: book.page,
         };
-        console.log("Mở dialog chỉnh sửa với:", processedBook);
 
         const params = new URLSearchParams(searchParams);
         params.set("id", book.id.toString());

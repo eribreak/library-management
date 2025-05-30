@@ -39,10 +39,6 @@ const OrderDetailTable: React.FC<OrderDetailTableProps> = ({
     const maxDate = oneWeekAfter.toISOString().split("T")[0];
 
     const handleStatusChange = (id: number, newStatus: string) => {
-        console.log(
-            `Changing status for book ${id} to ${newStatus} (type: ${typeof newStatus})`
-        );
-
         const updatedDetails = localDetails.map((detail) => {
             if (detail.id === id) {
                 const isReturnedStatus =
@@ -54,9 +50,6 @@ const OrderDetailTable: React.FC<OrderDetailTableProps> = ({
                       new Date().toISOString().split("T")[0]
                     : detail.return_date_real;
 
-                console.log(
-                    `Setting return_date_real to ${return_date_real} for book ${id}`
-                );
                 return { ...detail, status: newStatus, return_date_real };
             }
             return detail;
@@ -323,9 +316,6 @@ const OrderDetailTable: React.FC<OrderDetailTableProps> = ({
                 detail.status === "Đã trả";
 
             if (isReturnedStatus && !detail.return_date_real) {
-                console.log(
-                    `Setting return date for book ${detail.id} with status ${detail.status}`
-                );
                 return {
                     ...detail,
                     return_date_real: new Date().toISOString().split("T")[0],

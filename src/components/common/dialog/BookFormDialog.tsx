@@ -225,8 +225,6 @@ const BookFormDialog: React.FC<BookFormDialogProps> = ({
         const getSingleValue = (field: unknown) =>
             Array.isArray(field) && field.length > 0 ? field[0] : field;
 
-        console.log("Form data submitted:", data);
-
         const bookData: BookFormData = {
             title: data.title as string,
             short_description: data.short_description as string,
@@ -286,7 +284,6 @@ const BookFormDialog: React.FC<BookFormDialogProps> = ({
         }
 
         if (!showDialog && !firstRenderRef.current) {
-            console.log("BookFormDialog: Dialog closed, removing ID from URL");
             const params = new URLSearchParams(searchParams);
             params.delete("id");
             setSearchParams(params);

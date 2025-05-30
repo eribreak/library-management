@@ -51,17 +51,6 @@ const Employee: React.FC = () => {
         useState<EmployeeType | null>(null);
 
     useEffect(() => {
-        if (idFromUrl) {
-            const employeeId = parseInt(idFromUrl);
-            const employee = employees.find((emp) => emp.id === employeeId);
-
-            if (employee) {
-                console.log(`Selected employee with ID: ${employeeId}`);
-            }
-        }
-    }, [idFromUrl, employees]);
-
-    useEffect(() => {
         dispatch(
             fetchEmployees({
                 page: currentPage,

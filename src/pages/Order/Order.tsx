@@ -290,17 +290,12 @@ const Order = () => {
 
     useEffect(() => {
         if (isDetailDialogOpen && !dialogOpenRef.current && selectedOrderId) {
-            console.log(
-                "Opening order detail dialog with ID:",
-                selectedOrderId
-            );
             const params = new URLSearchParams(searchParams);
             params.set("id", selectedOrderId.toString());
             setSearchParams(params);
         }
 
         if (!isDetailDialogOpen && dialogOpenRef.current) {
-            console.log("Closing order detail dialog, removing ID from URL");
             const params = new URLSearchParams(searchParams);
             params.delete("id");
             setSearchParams(params);

@@ -83,7 +83,6 @@ function* fetchBooksWorker(
 function* addBookWorker(action: PayloadAction<any>): SagaIterator {
     try {
         const bookData = action.payload;
-        console.log("Adding book with data:", bookData);
 
         const thumbnailFile =
             bookData.thumbnailFile instanceof File
@@ -150,7 +149,6 @@ function* updateBookWorker(action: PayloadAction<any>): SagaIterator {
         }
 
         const bookData = action.payload;
-        console.log("Updating book with data:", bookData);
 
         let authorString = "";
         if (Array.isArray(bookData.author_ids)) {

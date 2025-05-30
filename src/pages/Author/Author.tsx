@@ -53,16 +53,6 @@ const Author: React.FC = () => {
         dispatch(resetAuthorState());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (idFromUrl) {
-            const authorId = parseInt(idFromUrl);
-            const author = authors.find((a) => a.id === authorId);
-
-            if (author) {
-                console.log(`Selected author with ID: ${authorId}`);
-            }
-        }
-    }, [idFromUrl, authors]);
 
     useEffect(() => {
         dispatch(
@@ -174,7 +164,7 @@ const Author: React.FC = () => {
         };
 
         const handleDialogClose = () => {
-            console.log("Author handleDialogClose called");
+       
             const params = new URLSearchParams(searchParams);
             params.delete("id");
             setSearchParams(params);

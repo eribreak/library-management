@@ -51,17 +51,6 @@ const Category: React.FC = () => {
         dispatch(resetCategoryState());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (idFromUrl) {
-            const categoryId = parseInt(idFromUrl);
-            const category = categories.find((c) => c.id === categoryId);
-
-            if (category) {
-                console.log(`Selected category with ID: ${categoryId}`);
-            }
-        }
-    }, [idFromUrl, categories]);
-
     const renderCategoryName = (category: CategoryType) => (
         <Tooltip content={category.name || "N/A"}>
             <div className={styles.category_name}>{category.name || "N/A"}</div>
@@ -82,7 +71,6 @@ const Category: React.FC = () => {
         };
 
         const handleDialogClose = () => {
-            console.log("Category handleDialogClose called");
             const params = new URLSearchParams(searchParams);
             params.delete("id");
             setSearchParams(params);

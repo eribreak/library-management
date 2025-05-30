@@ -52,17 +52,6 @@ const Publisher: React.FC = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (idFromUrl) {
-            const publisherId = parseInt(idFromUrl);
-            const publisher = publishers.find((p) => p.id === publisherId);
-
-            if (publisher) {
-                console.log(`Selected publisher with ID: ${publisherId}`);
-            }
-        }
-    }, [idFromUrl, publishers]);
-
-    useEffect(() => {
         dispatch(
             fetchPublishers({
                 page: currentPage,
@@ -208,7 +197,6 @@ const Publisher: React.FC = () => {
                 };
 
                 const handleDialogClose = () => {
-                    console.log("Publisher handleDialogClose called");
                     const params = new URLSearchParams(searchParams);
                     params.delete("id");
                     setSearchParams(params);
