@@ -13,7 +13,7 @@ import {
     resetUpdateStatus,
 } from "@/store/slices/orderSlice";
 import styles from "./OrderDetailDialog.module.css";
-import CustomButton from "../button/CustomButton";
+import CustomButton from "../../button/CustomButton";
 import { format } from "date-fns";
 
 interface OrderDetailDialogProps {

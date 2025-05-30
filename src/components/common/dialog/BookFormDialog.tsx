@@ -17,7 +17,7 @@ import styled from "./FormButton.module.css";
 import clsx from "clsx";
 import CustomButton from "../button/CustomButton";
 import editIcon from "@/assets/images/images/edit-icon.svg";
-import FormDialog from "./FormDialog";
+import FormDialog from "./formDialog/FormDialog";
 import { CustomInputField } from "../form/CustomInputField";
 import { CustomMultiSelect } from "../form/CustomMultiSelect";
 import { CustomTextarea } from "../form/CustomTextarea";
@@ -27,7 +27,7 @@ import { Box } from "@chakra-ui/react";
 import { bookSchema } from "@/utils/validator/bookForm";
 import ThumbnailUpload from "../form/ThumbnailUpload";
 import MultiImageUpload from "../form/MultiImageUpload";
-import CustomWysiwygEditor from "../form/CustomWysiwygEditor";
+import CustomWysiwygEditor from "../form/customWysiwygEditor/CustomWysiwygEditor";
 
 export interface BookFormData {
     id?: number;

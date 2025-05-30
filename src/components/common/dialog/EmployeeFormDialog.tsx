@@ -11,7 +11,7 @@ import styled from "./FormButton.module.css";
 import clsx from "clsx";
 import CustomButton from "../button/CustomButton";
 import editIcon from "@/assets/images/images/edit-icon.svg";
-import FormDialog from "./FormDialog";
+import FormDialog from "./formDialog/FormDialog";
 import { CustomInputField } from "../form/CustomInputField";
 import { employeeSchema } from "@/utils/validator/employee";
 import { IoMdAddCircleOutline } from "react-icons/io";

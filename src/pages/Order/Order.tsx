@@ -12,7 +12,7 @@ import {
 import CustomButton from "@/components/common/button/CustomButton";
 import styles from "./Order.module.css";
 import SimplePagination from "@/components/common/pagination/SimplePagination";
-import OrderDetailDialog from "@/components/common/dialog/OrderDetailDialog";
+import OrderDetailDialog from "@/components/common/dialog/orderDetailDialog/OrderDetailDialog";
 import { format } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

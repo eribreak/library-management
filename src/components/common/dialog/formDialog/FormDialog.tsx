@@ -7,7 +7,7 @@ import {
     UseFormProps,
 } from "react-hook-form";
 import { Dialog } from "@chakra-ui/react";
-import CustomButton from "../button/CustomButton";
+import CustomButton from "../../button/CustomButton";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import styles from "./FormDialog.module.css";
@@ -26,7 +26,7 @@ interface FormDialogProps<TFormData = Record<string, unknown>> {
     schema?: z.ZodType<TFormData>;
     width?: string;
     onFormChange?: (data: TFormData) => void;
-    isSubmitting?: boolean; 
+    isSubmitting?: boolean;
 }
 
 const FormDialog = <
@@ -61,7 +61,6 @@ const FormDialog = <
     }
     const methods = useForm<TFormData>(formOptions);
 
-    
     React.useEffect(() => {
         if (onFormChange) {
             const subscription = methods.watch((data) => {
@@ -73,11 +72,9 @@ const FormDialog = <
 
     const handleSubmit: SubmitHandler<TFormData> = (data) => {
         onSubmit(data);
-        
     };
 
     const handleOpenChange = (details: { open: boolean }) => {
-        
         if (!details.open && isSubmitting) {
             return;
         }
@@ -90,7 +87,6 @@ const FormDialog = <
     };
 
     const handleCancelClick = () => {
-        
         if (isSubmitting) {
             return;
         }
