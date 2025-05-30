@@ -19,7 +19,6 @@ import CustomButton from "../button/CustomButton";
 import editIcon from "@/assets/images/images/edit-icon.svg";
 import FormDialog from "./FormDialog";
 import { CustomInputField } from "../form/CustomInputField";
-import { CustomSelect } from "../form/CustomSelect";
 import { CustomMultiSelect } from "../form/CustomMultiSelect";
 import { CustomTextarea } from "../form/CustomTextarea";
 import { ReactSelect } from "../form/ReactSelect";
@@ -323,7 +322,12 @@ const BookFormDialog: React.FC<BookFormDialogProps> = ({
                         required
                     />
                 </Box>
-                <Box flex={2} display={"flex"} flexDirection={"column"} gap={6}>
+                <Box
+                    flex={2}
+                    display={"flex"}
+                    flexDirection={"column"}
+                    gap={10}
+                >
                     <Box display="flex" gap={4}>
                         <Box flex={1}>
                             <CustomInputField
@@ -350,7 +354,7 @@ const BookFormDialog: React.FC<BookFormDialogProps> = ({
                             />
                         </Box>
                     </Box>
-                    <Box display={"flex"} gap={6} flexWrap={"wrap"}>
+                    <Box display={"flex"} gap={10} flexWrap={"wrap"}>
                         <ReactSelect
                             name="publisher_id"
                             label="Nhà xuất bản"
@@ -387,7 +391,7 @@ const BookFormDialog: React.FC<BookFormDialogProps> = ({
     );
 
     const dialogTitle = effectiveIsEdit ? "Chỉnh sửa sách" : "Thêm sách mới";
-    const submitButtonText = effectiveIsEdit ? "Lưu" : "Thêm mới";
+    const submitButtonText = effectiveIsEdit ? "Lưu" : "Lưu";
 
     const dialogProps = {
         title: dialogTitle,

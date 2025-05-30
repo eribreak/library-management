@@ -7,15 +7,7 @@ import styles from "./Book.module.css";
 import SimplePagination from "@/components/common/pagination/SimplePagination";
 import { Toaster } from "@/components/ui/toaster";
 import { Tooltip } from "@/components/ui/tooltip";
-import {
-    Box,
-    Button,
-    Stack,
-    Flex,
-    Text,
-    Center,
-    Spinner,
-} from "@chakra-ui/react";
+import { Box, Button, Stack, Center, Spinner } from "@chakra-ui/react";
 import {
     Book as BookType,
     fetchBooks,
@@ -23,17 +15,24 @@ import {
     openEditDialog,
     deleteBook,
 } from "@/store/slices/bookSlice";
-import { fetchCategories } from "@/store/slices/categorySlice";
-import { fetchAuthors } from "@/store/slices/authorSlice";
-import { fetchPublishers } from "@/store/slices/publisherSlice";
+import {
+    fetchCategories,
+    resetCategoryState,
+} from "@/store/slices/categorySlice";
+import { fetchAuthors, resetAuthorState } from "@/store/slices/authorSlice";
+import {
+    fetchPublishers,
+    resetPublisherState,
+} from "@/store/slices/publisherSlice";
 import BookFormDialog from "@/components/common/dialog/BookFormDialog";
 import CustomButton from "@/components/common/button/CustomButton";
 import editIcon from "@/assets/images/images/edit-icon.svg";
 import deleteIcon from "@/assets/images/images/delete-icon.svg";
 import clsx from "clsx";
 import { IoMdAddCircleOutline } from "react-icons/io";
-import { TbFilter, TbFilterCancel, TbFilterCheck } from "react-icons/tb";
 import ConfirmDialog from "@/components/common/dialog/ConfirmDialog";
+import { RiResetLeftLine } from "react-icons/ri";
+import { IoSearchSharp } from "react-icons/io5";
 
 const Book = () => {
     const dispatch = useDispatch();
@@ -167,6 +166,14 @@ const Book = () => {
             );
         }
     }, []);
+
+    useEffect(() => {
+        return () => {
+            dispatch(resetCategoryState());
+            dispatch(resetAuthorState());
+            dispatch(resetPublisherState());
+        };
+    }, [dispatch]);
 
     const handleInputChange = (term: string) => {
         setSearchInput(term);
@@ -402,6 +409,7 @@ const Book = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
+
             render: (book) => (
                 <Tooltip
                     content={`Số lượng: ${
@@ -529,19 +537,18 @@ const Book = () => {
             <Box
                 display={"flex"}
                 justifyContent={"space-between"}
-                flexDirection={"column"}
+                flexDirection={"row"}
+                alignItems={"center"}
                 mb={"1.25rem"}
                 gap={3}
-             
             >
                 <div className={styles.filter_section}>
                     <Stack
                         direction="row"
-                        gap={3}
+                        gap={5}
                         flexWrap="wrap"
                         alignItems="center"
                         justifyContent={"center"}
-                        
                     >
                         <div className={styles.filter_group}>
                             <input
@@ -628,7 +635,7 @@ const Book = () => {
                                 htmlFor="includeDeleted"
                                 className={styles.filter_checkbox_label}
                             >
-                                Bao gồm sách đã xóa
+                                Sách đã xóa
                             </label>
                         </div>
 
@@ -649,12 +656,14 @@ const Book = () => {
                                         alignItems={"center"}
                                         gap={2}
                                     >
-                                        <TbFilterCancel /> <div>Đặt lại</div>
+                                        <RiResetLeftLine />
+                                        <div>Đặt lại</div>
                                     </Box>
                                 </Tooltip>
                             </Button>
                             <Button
-                                colorScheme={isFilterApplied ? "green" : "blue"}
+                                bg={"green.500"}
+                                border={"none"}
                                 onClick={handleApplyFilter}
                                 className={
                                     styles.filter_button +
@@ -668,7 +677,8 @@ const Book = () => {
                                         alignItems={"center"}
                                         gap={2}
                                     >
-                                        <TbFilterCheck /> <div>Lọc</div>
+                                        <IoSearchSharp />
+                                        <div>Lọc</div>
                                     </Box>
                                 </Tooltip>
                             </Button>
@@ -679,7 +689,6 @@ const Book = () => {
                     onClick={handleAddNew}
                     className={styles.add_button}
                     w={"fit-content"}
-                    alignSelf={"flex-end"}
                 >
                     <IoMdAddCircleOutline /> Thêm sách
                 </CustomButton>

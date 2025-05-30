@@ -14,7 +14,6 @@ import {
     deleteBook,
     deleteBookSuccess,
     deleteBookFailure,
-    Book,
     FetchBooksParams,
     PaginationInfo,
 } from "../slices/bookSlice";
@@ -86,13 +85,11 @@ function* addBookWorker(action: PayloadAction<any>): SagaIterator {
         const bookData = action.payload;
         console.log("Adding book with data:", bookData);
 
-        // Handle thumbnail file
         const thumbnailFile =
             bookData.thumbnailFile instanceof File
                 ? bookData.thumbnailFile
                 : undefined;
 
-        // Handle additional images
         const additionalImages = Array.isArray(bookData.imageFiles)
             ? bookData.imageFiles.filter(
                   (file: File | string) => file instanceof File
@@ -168,13 +165,11 @@ function* updateBookWorker(action: PayloadAction<any>): SagaIterator {
             categoryString = bookData.category_ids;
         }
 
-        // Handle thumbnail file
         const thumbnailFile =
             bookData.thumbnailFile instanceof File
                 ? bookData.thumbnailFile
                 : undefined;
 
-        // Handle additional images
         const additionalImages = Array.isArray(bookData.imageFiles)
             ? bookData.imageFiles.filter(
                   (file: File | string) => file instanceof File
@@ -252,8 +247,9 @@ function* deleteBookWorker(action: PayloadAction<number>): SagaIterator {
         });
     } catch (error: any) {
         const errorMessage =
-            (error.response?.data?.message && "Lỗi khi xóa sách") ||
-            "Lỗi khi xóa sách";
+            (error.response?.data?.message &&
+                "Không thể xóa vì sách đang trong đơn hàng") ||
+            "Không thể xóa vì sách đang trong đơn hàng";
 
         yield put(deleteBookFailure(errorMessage));
 

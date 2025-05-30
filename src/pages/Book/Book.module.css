@@ -83,7 +83,7 @@
     min-width: 180px;
 }
 
-.filter_select::placeholder  {
+.filter_select::placeholder {
     color: black;
 }
 
@@ -136,8 +136,6 @@
     align-items: center;
     gap: 0.5rem;
 }
-
-/* Add new class for deleted books */
 .deleted_row {
     background-color: #f2f2f2;
     opacity: 1;
@@ -147,7 +145,6 @@
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
-    
 }
 
 .filter_section {
@@ -155,6 +152,7 @@
     border-radius: var(--border-radius-large);
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    gap: 0.25rem;
 }
 
 .filter_title {
@@ -164,14 +162,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
 }
 
 .filter_group {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    max-width: 170px;
+    max-width: 145px;
 }
 
 .filter_label {
